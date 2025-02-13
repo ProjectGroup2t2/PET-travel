@@ -7,33 +7,47 @@ import Search from "./Search";
 
 const Navbar = () => {
   return (
-    <nav className="bg-white shadow-md flex items-center justify-between h-16 px-4 lg:px-24">
+    <nav className="bg-white border-b border-gray-200 flex items-center justify-between h-20 px-4 lg:px-8">
       {/* Logo & Search Bar */}
-      <div className="flex items-center flex-grow gap-10">
-        <div className="flex-shrink-0 relative top-[-10px]">
+      <div className="flex items-center flex-grow gap-8">
+        <div className="flex-shrink-0">
           <Logo />
         </div>
-        <div className="flex-grow max-w-sm">
+        <div className="flex-grow max-w-xl">
           <Search />
         </div>
       </div>
 
       {/* Navigation Links */}
-      <div className="hidden md:flex space-x-10 text-green-900 font-semibold items-center order-3">
-        <Link href="/" className="hover:text-gray-600 text-xl">
+      <div className="hidden md:flex items-center space-x-12">
+        <Link 
+          href="/" 
+          className="text-[#2A8470] hover:text-[#1f6254] font-medium text-lg transition-colors"
+        >
           HOME PAGE
         </Link>
-        <Link href="/Package" className="hover:text-gray-600 text-xl">
+        <Link 
+          href="/Package" 
+          className="text-[#2A8470] hover:text-[#1f6254] font-medium text-lg transition-colors"
+        >
           PACKAGE
         </Link>
-        <Link href="/about-us" className="hover:text-gray-600 text-xl">
+        <Link 
+          href="/about-us" 
+          className="text-[#2A8470] hover:text-[#1f6254] font-medium text-lg transition-colors"
+        >
           ABOUT US
         </Link>
+        
         {/* Icons */}
-        <div className="flex items-center space-x-3">
-          <Cart />
-          <div className="h-6 w-[1.5px] bg-gray-400 -mx-1"></div>
-          <Profile />
+        <div className="flex items-center space-x-4 ml-8">
+          <div className="hover:opacity-80 transition-opacity">
+            <Cart />
+          </div>
+          <div className="h-6 w-[1px] bg-gray-300"></div>
+          <div className="hover:opacity-80 transition-opacity">
+            <Profile />
+          </div>
         </div>
       </div>
     </nav>

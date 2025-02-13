@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const Cart = () => {
   return (
-    <Link href="#" >
+    <Link href="/cart">
         <ShoppingCart size={32}/>
     </Link>
   )
