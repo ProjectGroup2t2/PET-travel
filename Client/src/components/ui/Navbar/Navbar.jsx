@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";  
 import Logo from "./Logo";
 import Cart from "./Cart";
 import Profile from "./Profile";
@@ -19,15 +20,15 @@ const Navbar = () => {
 
       {/* Navigation Links */}
       <div className="hidden md:flex space-x-10 text-green-900 font-semibold items-center order-3">
-        <a href="/" className="hover:text-gray-600 text-xl">
+        <Link href="/" className="hover:text-gray-600 text-xl">
           HOME PAGE
-        </a>
-        <a href="#" className="hover:text-gray-600 text-xl">
+        </Link>
+        <Link href="/Package" className="hover:text-gray-600 text-xl">
           PACKAGE
-        </a>
-        <a href="#" className="hover:text-gray-600 text-xl">
+        </Link>
+        <Link href="/about-us" className="hover:text-gray-600 text-xl">
           ABOUT US
-        </a>
+        </Link>
         {/* Icons */}
         <div className="flex items-center space-x-3">
           <Cart />
@@ -39,4 +40,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar
+export default Navbar;
