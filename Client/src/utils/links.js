@@ -1,5 +1,5 @@
 export const links = [
-    { href: "/", label: "My Account" },
-    { href: "/My Purchase", label: "My Purchase" },
+    { href: "/Profile", label: "My Account" },
+    { href: "/MyPurchase", label: "My Purchase" },
 ];
   
