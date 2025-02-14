@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Link from "next/link";  
 import Logo from "./Logo";
@@ -5,19 +6,25 @@ import Cart from "./Cart";
 import Profile from "./Profile";
 import Search from "./Search";
 
+import { usePathname } from "next/navigation";
+
 const Navbar = () => {
+  const pathname = usePathname();
+  const hiddenNavbar = ["/login", "/register"];
+
+  if (hiddenNavbar.includes(pathname)) return null;
+
   return (
     <nav className="bg-white border-b border-gray-200 flex items-center justify-between h-20 px-4 lg:px-8">
       {/* Logo & Search Bar */}
-      <div className="flex items-center flex-grow gap-8">
-        <div className="flex-shrink-0">
+      <div className="flex items-center flex-grow gap-10">
+        <div className="flex-shrink-0 relative top-[-10px]">
           <Logo />
         </div>
-        <div className="flex-grow max-w-xl">
+        <div className="flex-grow max-w-sm">
           <Search />
         </div>
       </div>
-
       {/* Navigation Links */}
       <div className="hidden md:flex items-center space-x-12">
         <Link 
