@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const hiddenNavbar = ["/login", "/register"];
+  const hiddenNavbar = ["/login", "/register", "/admin"];
 
   if (hiddenNavbar.includes(pathname)) return null;
 
