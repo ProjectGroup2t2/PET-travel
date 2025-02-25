@@ -58,7 +58,7 @@ export default function AccountPage() {
           <CardTitle>Booking History</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500">No booking history available now.</p>
+          <p className="text-gray-500">No booking history available.</p>
         </CardContent>
       </Card>
       
