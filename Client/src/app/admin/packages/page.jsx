@@ -19,7 +19,7 @@ export default function Package() {
           reviews: 204,
           capacity: '50/60',
           duration: 'รายวัน',
-          price: 'THB X,XXX',
+          price: 'THB 5,590',
           isSellOut: false
         },
         {
@@ -30,7 +30,7 @@ export default function Package() {
           reviews: 320,
           capacity: '30/40',
           duration: '3 วัน 2 คืน',
-          price: 'THB Y,YYY',
+          price: 'THB 6,990',
           isSellOut: true
         }
       ];
