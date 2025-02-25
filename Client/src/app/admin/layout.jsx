@@ -12,7 +12,7 @@ export default function AdminLayout({ children }) {
             <img
                   src="/logo.svg"
                   alt=""
-                  className="w-20 h-20 rounded-lg object-cover"
+                  className="w-32 h-auto mx-auto object-contain"
                  
                 />
           </Link>

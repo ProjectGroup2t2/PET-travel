@@ -131,7 +131,7 @@ export default function AdminDashboard() {
                 <path
                   d="M0 150 C50 120, 100 160, 150 100 C200 40, 250 140, 300 80 C350 20, 400 60, 450 40 L450 200 L0 200 Z"
                   fill="url(#line-gradient)"
-                />
+                />  
 
                 
                 <path
