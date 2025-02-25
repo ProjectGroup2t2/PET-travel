@@ -136,6 +136,7 @@ const Package = () => {
                     className="object-cover"
                   />
                 </div>
+                
                 <div className="p-4 md:col-span-2">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
