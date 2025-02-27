@@ -4,8 +4,6 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User, Clock, Heart } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 
 export default function WishlistsPage() {
     const [wishlistItems] = useState([
