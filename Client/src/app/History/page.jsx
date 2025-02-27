@@ -123,6 +123,10 @@ export default function HistoryPage() {
                                         </div>
                                     </div>
                                 </div>
+                                <dir>
+                                    <div className="p-2">
+                                    </div>
+                                </dir>
                                 <div className="bg-gray-50 p-2 text-right">
                                     <span className="text-gray-600">{booking.status}</span>
                                 </div>
