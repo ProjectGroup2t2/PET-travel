@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Facebook, Instagram, MessageCircle, Twitter } from 'lucide-react';
 
 const AboutUs = () => {
@@ -56,10 +57,10 @@ const AboutUs = () => {
         <div>
           <h2 className="text-2xl font-bold text-[#2A8470] text-center mb-8">WHY CHOOSE US?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
+
             {/* Card 1 */}
             <div className="space-y-4">
-            <Image
+              <Image
                 src="/1.jpg"
                 alt="Pier view"
                 width={400}
@@ -106,28 +107,47 @@ const AboutUs = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t mt-16 py-8">
+      <footer className="bg-[#2D776E] text-white py-8 w-full">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            {/* โลโก้ */}
             <Image
-              src="/logo.svg"
+              src="/logoW.png"
               alt="PETI Logo"
-              width={200}
-              height={150}
+              width={170}
+              height={90}
             />
-            <div className="text-gray-600 text-center md:text-left">
-              <p>15 KANCHANAWANICH ROAD, KHO HONG, HAT</p>
-              <p>YAI DISTRICT, SONGKHLA 90110, THAILAND</p>
+
+            {/* ข้อมูลติดต่อ */}
+            <div className="text-center md:text-left">
+              <p className="font-semibold">Contact us</p>
+              <p>yimwired@gmail.com</p>
             </div>
-            <div className="text-gray-600">
-              <p>+1 234 567 890</p>
-              <p>EMAIL@GMAIL.COM</p>
+
+            {/* เกี่ยวกับ */}
+            <div className="text-center">
+              <p className="font-semibold">About</p>
+              <p>@PET2025</p>
             </div>
+
+            {/* ไอคอนโซเชียลมีเดียพร้อมลิงก์ */}
             <div className="flex gap-4">
-              <Facebook className="w-6 h-6" />
-              <Instagram className="w-6 h-6" />
-              <MessageCircle className="w-6 h-6" />
-              <Twitter className="w-6 h-6" />
+              <Link href="#" className="hover:text-[#24685F]">
+                <Facebook className="w-6 h-6" />
+                <span className="sr-only">Facebook</span>
+              </Link>
+              <Link href="#" className="hover:text-[#24685F]">
+                <Instagram className="w-6 h-6" />
+                <span className="sr-only">Instagram</span>
+              </Link>
+              <Link href="#" className="hover:text-[#24685F]">
+                <MessageCircle className="w-6 h-6" />
+                <span className="sr-only">MessageCircle</span>
+              </Link>
+              <Link href="#" className="hover:text-[#24685F]">
+                <Twitter className="w-6 h-6" />
+                <span className="sr-only">Twitter</span>
+              </Link>
             </div>
           </div>
         </div>
