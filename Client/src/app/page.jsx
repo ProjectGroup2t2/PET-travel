@@ -100,29 +100,6 @@ const Homepage = () => {
           <p className="text-white text-xl mb-8">
             Plan better with travel experiences!
           </p>
-
-          {/* Search Bar */}
-          <div className="bg-white rounded-full p-2 flex items-center w-full max-w-3xl">
-            <div className="flex-1 flex items-center px-4 border-r">
-              <Search className="w-5 h-5 text-gray-400 mr-2" />
-              <input
-                type="text"
-                placeholder="Where to?"
-                className="w-full outline-none text-gray-700"
-              />
-            </div>
-            <div className="flex-1 flex items-center px-4">
-              <Calendar className="w-5 h-5 text-gray-400 mr-2" />
-              <input
-                type="text"
-                placeholder="When?"
-                className="w-full outline-none text-gray-700"
-              />
-            </div>
-            <Button className="rounded-full bg-[#2A8470] hover:bg-[#1f6254]">
-              <Search className="w-5 h-5" />
-            </Button>
-          </div>
         </div>
       </div>
 

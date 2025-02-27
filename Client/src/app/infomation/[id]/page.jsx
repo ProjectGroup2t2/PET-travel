@@ -2,16 +2,23 @@
 
 import { useState } from "react"
 import { useParams } from "next/navigation"
-import Link from "next/link"
-import { Star } from "lucide-react"
+import { Star, Clock, Car, Users } from "lucide-react"
 
 export default function PackageDetail() {
     const { id } = useParams()
     const [selectedImage, setSelectedImage] = useState(0)
     const [travelers, setTravelers] = useState(2)
     const [selectedDate, setSelectedDate] = useState("")
+    const tourTime = "ALL DAY"
+    const tourType = "Private Tour"
+    const maxGroupSize = 15
 
-    const images = ["/ppp/4f575727-7e5c-47a8-87ee-2f7fc48685ac.jpg", "/ppp/151574405_4060265390664121_2469216028614535966_o-e1616495101304.jpg", "/ppp/PromthepCape-1-1024x576.jpg", "/ppp/ทัวร์เกาะพีพีเต็มวันด้วยเรือสปีดโบ๊ทจากภูเก็ตโดยSeastar-Klookประเทศไทย.jpg"]
+    const images = [
+        "/ppp/4f575727-7e5c-47a8-87ee-2f7fc48685ac.jpg",
+        "/ppp/151574405_4060265390664121_2469216028614535966_o-e1616495101304.jpg",
+        "/ppp/PromthepCape-1-1024x576.jpg",
+        "/ppp/ทัวร์เกาะพีพีเต็มวันด้วยเรือสปีดโบ๊ทจากภูเก็ตโดยSeastar-Klookประเทศไทย.jpg",
+    ]
 
     const relatedTours = [
         {
@@ -43,7 +50,6 @@ export default function PackageDetail() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
                 {/* Left Sidebar - Thumbnails */}
                 <div className="md:col-span-1 flex md:flex-col gap-2">
@@ -69,6 +75,52 @@ export default function PackageDetail() {
                         <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                         <span className="text-sm font-medium">4.0</span>
                         <span className="text-sm text-gray-500">(125 reviews)</span>
+                    </div>
+                    
+                    {/* details */}
+                    <div className="w-full border-t border-b border-gray-200 py-4 mt-8">
+                        <div className="container mx-auto">
+                            <div className="flex flex-wrap md:flex-nowrap">
+                                {/* Duration Section */}
+                                <div className="flex items-center w-full md:w-1/3 py-2 md:py-0">
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mr-4">
+                                        <Clock className="w-6 h-6 text-gray-700" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600 font-medium">ระยะเวลา</p>
+                                        <p className="text-base font-medium">{tourTime}</p>
+                                    </div>
+                                </div>
+
+                                {/* Divider for desktop */}
+                                <div className="hidden md:block w-px bg-gray-200 mx-2"></div>
+
+                                {/* Tour Type Section */}
+                                <div className="flex items-center w-full md:w-1/3 py-2 md:py-0">
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mr-4">
+                                        <Car className="w-6 h-6 text-gray-700" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600 font-medium">ประเภททัวร์</p>
+                                        <p className="text-base font-medium">{tourType}</p>
+                                    </div>
+                                </div>
+
+                                {/* Divider for desktop */}
+                                <div className="hidden md:block w-px bg-gray-200 mx-2"></div>
+
+                                {/* Group Size Section */}
+                                <div className="flex items-center w-full md:w-1/3 py-2 md:py-0">
+                                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mr-4">
+                                        <Users className="w-6 h-6 text-gray-700" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-600 font-medium">ขนาดกรุ๊ป</p>
+                                        <p className="text-base font-medium">สูงสุด {maxGroupSize} คน / กรุ๊ป</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -148,15 +200,28 @@ export default function PackageDetail() {
                 </div>
             </div>
 
+
             {/* Tour Information */}
             <div className="mt-12">
                 <h2 className="text-2xl font-bold mb-6">INFORMATION</h2>
                 <div className="prose max-w-none">
+                    <h3 className="text-xl font-semibold mt-4 mb-2">ประวัติที่เกี่ยวข้องกับทัวร์</h3>
                     <p>เนื่องจากเป็นสถานที่ที่เต็มไปด้วยประวัติศาสตร์และเสน่ห์เฉพาะตัว</p>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">สถานที่สำคัญในทัวร์</h3>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">แหล่งท่องเที่ยว</h3>
                     <ul className="list-disc pl-5 space-y-1">
                         <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
-                        <li>พิพิธภัณฑ์ภูเก็ต: สถานที่เรียนรู้ประวัติศาสตร์ความเป็นมาของจังหวัดภูเก็ต</li>
+                    </ul>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">กำหนดการ</h3>
+                    <ul className="list-disc pl-5 space-y-1">
+                        <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
+                    </ul>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">คำแนะนำการเตรียมตัว</h3>
+                    <ul className="list-disc pl-5 space-y-1">
+                        <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
+                    </ul>
+                    <h3 className="text-xl font-semibold mt-4 mb-2">บริการที่รวมแพ็คเกจ</h3>
+                    <ul className="list-disc pl-5 space-y-1">
+                        <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
                     </ul>
                 </div>
             </div>
