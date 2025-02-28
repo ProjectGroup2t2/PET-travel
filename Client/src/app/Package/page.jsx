@@ -184,7 +184,7 @@ const Package = () => {
             />
 
             {/* ข้อมูลติดต่อ */}
-            <div className="text-center md:text-left">
+            <div className="text-center">
               <p className="font-semibold">Contact us</p>
               <p>yimwired@gmail.com</p>
             </div>
