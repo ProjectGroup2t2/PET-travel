@@ -101,6 +101,7 @@ const Homepage = () => {
           <p className="text-white text-xl mb-8">
             Plan better with travel experiences!
           </p>
+
         </div>
       </div>
 
