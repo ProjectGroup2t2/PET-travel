@@ -40,31 +40,10 @@ export default function AccountPage() {
                   <Label>Email</Label>
                   <Input type="email" placeholder="john.doe@example.com" />
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Saved Credit Cards</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <Label>Card Number</Label>
-                  <Input type="text" value="**** **** **** 1234" disabled />
+                <div className="md:col-span-2">
+                  <Label>Phone Number</Label>
+                  <Input type="tel" placeholder="+66 1234 5678" />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Expiry Date</Label>
-                    <Input type="text" placeholder="MM/YY" />
-                  </div>
-                  <div>
-                    <Label>CVV</Label>
-                    <Input type="text" placeholder="123" />
-                  </div>
-                </div>
-                <p className="text-gray-500 text-sm">Visa and MasterCard</p>
               </div>
             </CardContent>
           </Card>
