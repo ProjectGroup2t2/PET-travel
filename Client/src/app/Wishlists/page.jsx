@@ -16,7 +16,7 @@ export default function WishlistsPage() {
             rating: 4.0,
             reviews: 204,
             capacity: "50/60",
-            duration: "ราชวัน",
+            duration: "รายวัน",
             location: "ภูเก็ต",
             price: "X,XXX",
             isFavorite: true,
@@ -27,7 +27,7 @@ export default function WishlistsPage() {
             rating: 4.0,
             reviews: 204,
             capacity: "50/60",
-            duration: "ราชวัน",
+            duration: "รายวัน",
             location: "ภูเก็ต",
             price: "X,XXX",
             isFavorite: false,
@@ -52,7 +52,7 @@ export default function WishlistsPage() {
                                         size="icon"
                                         className="absolute top-2 right-2 bg-white/80 rounded-full h-8 w-8 p-1 shadow-md"
                                     >
-                                        <Heart className={`h-5 w-5 ${item.isFavorite ? "text-red-500 fill-red-500" : "text-gray-500"}`} />
+                                        <Heart className="h-5 w-5 fill-teal-600" />
                                     </Button>
                                 </div>
                                 <CardContent className="p-4">
