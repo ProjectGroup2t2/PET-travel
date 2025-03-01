@@ -52,6 +52,7 @@ export default function PackageDetail() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                
                 {/* Left Sidebar - Thumbnails */}
                 <div className="md:col-span-1 flex md:flex-col gap-2">
                     {images.map((img, index) => (
@@ -60,12 +61,16 @@ export default function PackageDetail() {
                             className={`cursor-pointer border-2 ${selectedImage === index ? "border-green-500" : "border-transparent"}`}
                             onClick={() => setSelectedImage(index)}
                         >
-                            <img src={img || "/placeholder.svg"} alt={`Thumbnail ${index + 1}`} className="w-24 h-20 object-cover" />
+                            <img
+                                src={img || "/placeholder.svg"}
+                                alt={`Thumbnail ${index + 1}`}
+                                className="w-24 h-20 object-cover"
+                            />
                         </div>
                     ))}
                 </div>
 
-                {/* Main Image */}
+                {/* Main Image + INFORMATION */}
                 <div className="md:col-span-7 relative">
                     <img
                         src={images[selectedImage] || "/placeholder.svg"}
@@ -123,9 +128,37 @@ export default function PackageDetail() {
                             </div>
                         </div>
                     </div>
+
+                    <div className="mt-6">
+                        <h2 className="text-2xl font-bold mb-4">INFORMATION</h2>
+                        <div className="prose max-w-none">
+                            <h3 className="text-xl font-semibold mb-2">ประวัติที่เกี่ยวข้องกับทัวร์</h3>
+                            <p>เนื่องจากเป็นสถานที่ที่เต็มไปด้วยประวัติศาสตร์และเสน่ห์เฉพาะตัว</p>
+
+                            <h3 className="text-xl font-semibold mb-2">แหล่งท่องเที่ยว</h3>
+                            <ul className="list-disc pl-5 space-y-1">
+                                <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
+                            </ul>
+
+                            <h3 className="text-xl font-semibold mb-2">กำหนดการ</h3>
+                            <ul className="list-disc pl-5 space-y-1">
+                                <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
+                            </ul>
+
+                            <h3 className="text-xl font-semibold mb-2">คำแนะนำการเตรียมตัว</h3>
+                            <ul className="list-disc pl-5 space-y-1">
+                                <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
+                            </ul>
+
+                            <h3 className="text-xl font-semibold mb-2">บริการที่รวมแพ็คเกจ</h3>
+                            <ul className="list-disc pl-5 space-y-1">
+                                <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
                 </div>
 
-                {/* Right Sidebar - Booking Form */}
                 <div className="md:col-span-4">
                     <div className="border rounded-lg p-6 space-y-6">
                         <div className="space-y-2">
@@ -190,6 +223,45 @@ export default function PackageDetail() {
                                 </div>
                             </div>
 
+                            <div>
+                                <p className="text-sm font-medium mb-2">Pickup points</p>
+                                <div className="space-y-2">
+                                    <label className="flex items-center">
+                                        <input type="checkbox" className="mr-2" />
+                                        Pick and drop off
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="w-full p-2 border rounded-md"
+                                        placeholder="โรงแรมอินเตอร์คอนติเนนตัล"
+                                    />
+                                </div>
+                                <div className="mt-4">
+                                    <label className="flex items-center">
+                                        <input type="checkbox" className="mr-2" />
+                                        Pick - Drop (Split)
+                                    </label>
+                                    <div className="grid grid-cols-2 gap-4 mt-2">
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Pick up :</label>
+                                            <input
+                                                type="text"
+                                                className="w-full p-2 border rounded-md"
+                                                placeholder="ระบุสถานที่"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Drop off :</label>
+                                            <input
+                                                type="text"
+                                                className="w-full p-2 border rounded-md"
+                                                placeholder="ระบุสถานที่"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="flex space-x-4">
                                 <button
                                     type="submit"
@@ -209,31 +281,6 @@ export default function PackageDetail() {
                 </div>
             </div>
 
-            {/* Tour Information */}
-            <div className="mt-12">
-                <h2 className="text-2xl font-bold mb-6">INFORMATION</h2>
-                <div className="prose max-w-none">
-                    <h3 className="text-xl font-semibold mt-4 mb-2">ประวัติที่เกี่ยวข้องกับทัวร์</h3>
-                    <p>เนื่องจากเป็นสถานที่ที่เต็มไปด้วยประวัติศาสตร์และเสน่ห์เฉพาะตัว</p>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">แหล่งท่องเที่ยว</h3>
-                    <ul className="list-disc pl-5 space-y-1">
-                        <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
-                    </ul>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">กำหนดการ</h3>
-                    <ul className="list-disc pl-5 space-y-1">
-                        <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
-                    </ul>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">คำแนะนำการเตรียมตัว</h3>
-                    <ul className="list-disc pl-5 space-y-1">
-                        <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
-                    </ul>
-                    <h3 className="text-xl font-semibold mt-4 mb-2">บริการที่รวมแพ็คเกจ</h3>
-                    <ul className="list-disc pl-5 space-y-1">
-                        <li>ถนนถลาง (Thalang Road): ถนนสายหลักของย่านเก่า เต็มไปด้วยร้านค้า ร้านอาหาร และงานสถาปัตย์</li>
-                    </ul>
-                </div>
-            </div>
-
             {/* Related Tours */}
             <div className="mt-12">
                 <h2 className="text-2xl font-bold mb-6">ดูรายละเอียดทัวร์อื่นๆ</h2>
@@ -241,9 +288,15 @@ export default function PackageDetail() {
                     {relatedTours.map((tour) => (
                         <div key={tour.id} className="border rounded-lg overflow-hidden">
                             <div className="relative">
-                                <img src={tour.image || "/placeholder.svg"} alt={tour.title} className="w-full h-48 object-cover" />
+                                <img
+                                    src={tour.image || "/placeholder.svg"}
+                                    alt={tour.title}
+                                    className="w-full h-48 object-cover"
+                                />
                                 {tour.isSellOut && (
-                                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm">Sell Out</div>
+                                    <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-sm">
+                                        Sell Out
+                                    </div>
                                 )}
                             </div>
                             <div className="p-4">
