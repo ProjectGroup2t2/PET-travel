@@ -190,17 +190,24 @@ export default function PackageDetail() {
                                 </div>
                             </div>
 
-                            <button
-                                type="submit"
-                                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-                            >
-                                ใส่ตะกร้า
-                            </button>
+                            <div className="flex space-x-4">
+                                <button
+                                    type="submit"
+                                    className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
+                                >
+                                    ใส่ตะกร้า
+                                </button>
+                                <button
+                                    type="button"
+                                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                    จองเลย
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
-
 
             {/* Tour Information */}
             <div className="mt-12">
@@ -255,4 +262,3 @@ export default function PackageDetail() {
         </div>
     )
 }
-
