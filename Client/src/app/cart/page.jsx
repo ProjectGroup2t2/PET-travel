@@ -86,7 +86,8 @@ const Cart = () => {
 
       {/* Book Button */}
       <div className="flex justify-end">
-        <Button className="bg-[#24685F] hover:bg-[#1E5A50] text-white px-8 py-2 text-lg">
+        <Button className="bg-[#24685F] hover:bg-[#1E5A50] text-white px-8 py-2 text-lg"
+        >
           จองเลย
         </Button>
       </div>
