@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { User, Clock, Heart, MapPin, Search, ShoppingCart } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { Facebook, Instagram, MessageCircle, Twitter } from 'lucide-react';
 
 export default function HistoryPage() {
     const bookings = [
@@ -135,6 +136,52 @@ export default function HistoryPage() {
                     ))}
                 </div>
             </main>
+            {/* Footer */}
+      <footer className="bg-[#2D776E] text-white py-8 w-full">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            {/* โลโก้ */}
+            <Image
+              src="/logoW.png"
+              alt="PETI Logo"
+              width={170}
+              height={90}
+            />
+
+            {/* ข้อมูลติดต่อ */}
+            <div className="text-center">
+              <p className="font-semibold">Contact us</p>
+              <p>yimwired@gmail.com</p>
+            </div>
+
+            {/* เกี่ยวกับ */}
+            <div className="text-center">
+              <p className="font-semibold">About</p>
+              <p>@PET2025</p>
+            </div>
+
+            {/* ไอคอนโซเชียลมีเดียพร้อมลิงก์ */}
+            <div className="flex gap-4">
+              <Link href="#" className="hover:text-[#24685F]">
+                <Facebook className="w-6 h-6" />
+                                <span className="sr-only">Facebook</span>
+                            </Link>
+                            <Link href="#" className="hover:text-[#24685F]">
+                                <Instagram className="w-6 h-6" />
+                                <span className="sr-only">Instagram</span>
+                            </Link>
+                            <Link href="#" className="hover:text-[#24685F]">
+                                <MessageCircle className="w-6 h-6" />
+                                <span className="sr-only">MessageCircle</span>
+                            </Link>
+                            <Link href="#" className="hover:text-[#24685F]">
+                                <Twitter className="w-6 h-6" />
+                                <span className="sr-only">Twitter</span>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     )
 }

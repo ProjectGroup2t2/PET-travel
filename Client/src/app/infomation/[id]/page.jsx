@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useParams } from "next/navigation"
 import { Star, Clock, Car, Users } from "lucide-react"
+import { Facebook, Instagram, MessageCircle, Twitter } from 'lucide-react';
 
 export default function PackageDetail() {
     const { id } = useParams()
