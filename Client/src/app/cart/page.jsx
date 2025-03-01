@@ -1,9 +1,14 @@
+'use client';
+
 import React from "react";
 import Image from "next/image";
 import { Clock, Users } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation'; 
 
 const Cart = () => {
+  const router = useRouter(); 
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
@@ -86,7 +91,9 @@ const Cart = () => {
 
       {/* Book Button */}
       <div className="flex justify-end">
-        <Button className="bg-[#24685F] hover:bg-[#1E5A50] text-white px-8 py-2 text-lg"
+        <Button
+          onClick={() => router.push('/payment')} 
+          className="bg-[#24685F] hover:bg-[#1E5A50] text-white px-8 py-2 text-lg"
         >
           จองเลย
         </Button>
