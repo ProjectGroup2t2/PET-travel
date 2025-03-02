@@ -29,101 +29,93 @@ export default function Payment() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-
-      <h1 className="text-4xl font-bold mb-4 text-center">Payment</h1>
-
-      <div className="flex justify-center mb-8">
-        <div className="border p-4 inline-block">
-          <Image
-            src="/qr.jpeg" 
-            alt="QR Code"
-            width={128}
-            height={128}
-            className="object-cover"
-          />
+    <div className="container mx-auto px-8 py-8 flex flex-col items-center min-h-screen">
+      <div className="bg-white shadow-lg rounded-lg p-6 border w-full max-w-4xl">
+        <h1 className="text-4xl font-bold mb-6 text-white bg-[#24685F] p-4 rounded-t-lg text-center">PAYMENT</h1>
+        
+        <div className="flex flex-col md:flex-row items-center justify-between p-6">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="bg-gray-100 shadow-md rounded-lg p-6 w-full md:w-1/2">
+            <div className="flex gap-4 mb-4">
+              <div className="w-1/2">
+                <label className="block text-gray-700 mb-1">ชื่อ</label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="border rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#24685F]"
+                  required
+                />
+              </div>
+              <div className="w-1/2">
+                <label className="block text-gray-700 mb-1">นามสกุล</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="border rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#24685F]"
+                  required
+                />
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">อีเมล</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="border rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#24685F]"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">เบอร์โทร</label>
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="border rounded w-full px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#24685F]"
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1">อัปโหลดสลิป</label>
+              <input
+                type="file"
+                name="slip"
+                accept="image/*"
+                onChange={handleChange}
+                className="border rounded w-full px-3 py-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-none file:bg-[#24685F] file:text-white cursor-pointer"
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              className="bg-[#24685F] hover:bg-[#1E5A50] text-white w-full py-2 text-lg rounded-lg"
+            >
+              ยืนยันการชำระเงิน
+            </Button>
+          </form>
+          
+          {/* QR Code */}
+          <div className="flex flex-col items-center w-full md:w-1/2 mt-6 md:mt-0">
+            <h2 className="text-2xl font-semibold text-[#24685F]">QR CODE & PROMPT PAY</h2>
+            <Image
+              src="/qr.png"
+              alt="QR Code"
+              width={300}
+              height={300}
+              className="border p-2 rounded-lg mt-4"
+            />
+            <p className="text-lg font-semibold text-gray-700 mt-2">0935941899</p>
+            <p className="text-md text-gray-600">นายณัฐพล ยิ้มน้อย</p>
+          </div>
         </div>
       </div>
-
-
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-
-        <div className="mb-4">
-          <label htmlFor="firstName" className="block mb-1">ชื่อ</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="border rounded w-full px-3 py-2"
-            required
-          />
-        </div>
-
-        {/* นามสกุล */}
-        <div className="mb-4">
-          <label htmlFor="lastName" className="block mb-1">นามสกุล</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="border rounded w-full px-3 py-2"
-            required
-          />
-        </div>
-
-        {/* เบอร์โทร */}
-        <div className="mb-4">
-          <label htmlFor="phone" className="block mb-1">เบอร์โทร</label>
-          <input
-            type="text"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            className="border rounded w-full px-3 py-2"
-            required
-          />
-        </div>
-
-        {/* อีเมล */}
-        <div className="mb-4">
-          <label htmlFor="email" className="block mb-1">อีเมล</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="border rounded w-full px-3 py-2"
-            required
-          />
-        </div>
-
-        {/* อัปโหลดสลิป */}
-        <div className="mb-4">
-          <label htmlFor="slip" className="block mb-1">อัปโหลดสลิป</label>
-          <input
-            type="file"
-            id="slip"
-            name="slip"
-            accept="image/*"
-            onChange={handleChange}
-            className="border rounded w-full px-3 py-2"
-            required
-          />
-        </div>
-
-        <Button
-          type="submit"
-          className="bg-[#24685F] hover:bg-[#1E5A50] text-white px-8 py-2 text-lg"
-        >
-          ยืนยันการชำระเงิน
-        </Button>
-      </form>
     </div>
   );
 }
