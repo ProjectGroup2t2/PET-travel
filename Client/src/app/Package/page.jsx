@@ -219,7 +219,8 @@ const Package = () => {
               <div className="space-y-2">
                 <label className="flex items-center space-x-2">
                   <input
-                    type="checkbox"
+                    type="radio"
+                    name="timeFilter"
                     checked={timeFilters.morning}
                     onChange={() => handleTimeFilterChange("morning")}
                   />
@@ -230,7 +231,8 @@ const Package = () => {
                 </label>
                 <label className="flex items-center space-x-2">
                   <input
-                    type="checkbox"
+                    type="radio"
+                    name="timeFilter"
                     checked={timeFilters.afternoon}
                     onChange={() => handleTimeFilterChange("afternoon")}
                   />
@@ -241,7 +243,8 @@ const Package = () => {
                 </label>
                 <label className="flex items-center space-x-2">
                   <input
-                    type="checkbox"
+                    type="radio"
+                    name="timeFilter"
                     checked={timeFilters.allDay}
                     onChange={() => handleTimeFilterChange("allDay")}
                   />
