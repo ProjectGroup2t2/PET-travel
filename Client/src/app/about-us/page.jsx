@@ -159,6 +159,7 @@ const AboutUs = () => {
                   width={400}
                   height={250}
                   className="rounded-md mx-auto"
+                  style={{ width: "100%", height: "200px", objectFit: "cover" }}
                 />
                 <h3 className="text-xl font-semibold mt-4">{card.title}</h3>
                 <p className="text-gray-600 mt-2">{card.description}</p>
