@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Calendar, Star } from "lucide-react"
 import { Facebook, Instagram, MessageCircle, Twitter } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 // Mock data for tours
 const mockTours = [
@@ -135,13 +136,30 @@ const Package = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen flex flex-col"
+    >
       <div className="container mx-auto p-4 flex-grow">
-        <h1 className="text-4xl font-bold mb-8">All Tour package</h1>
+        <motion.h1
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-4xl font-bold mb-8"
+        >
+          All Tour package
+        </motion.h1>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
-          <div className="space-y-6">
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="space-y-6"
+          >
             <div className="border rounded-lg p-4">
               <h2 className="font-semibold mb-4">When are you traveling?</h2>
               <div className="relative">
@@ -280,10 +298,15 @@ const Package = () => {
                 </label>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Tour Listings */}
-          <div className="md:col-span-3 space-y-6">
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="md:col-span-3 space-y-6"
+          >
             <div className="flex justify-between items-center mb-4">
               <div>{filteredTours.length} results</div>
               <select className="border rounded-md p-2">
@@ -295,50 +318,70 @@ const Package = () => {
             </div>
 
             {/* Tour Cards */}
-            {filteredTours.length > 0 ? (
-              filteredTours.map((tour) => (
-                <div key={tour.id} className="border rounded-lg overflow-hidden">
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="relative h-64 md:h-full">
-                      <Image src="/1.jpg" alt={`${tour.name} tour image`} fill className="object-cover" />
-                    </div>
+            <AnimatePresence>
+              {filteredTours.length > 0 ? (
+                filteredTours.map((tour, index) => (
+                  <motion.div
+                    key={tour.id}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -50 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="border rounded-lg overflow-hidden"
+                  >
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="relative h-64 md:h-full">
+                        <Image src="/1.jpg" alt={`${tour.name} tour image`} fill className="object-cover" />
+                      </div>
 
-                    <div className="p-4 md:col-span-2">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-2">
-                          <Star className="h-5 w-5 text-yellow-400" />
-                          <span className="font-semibold">{tour.rating.toFixed(1)}</span>
-                          <span className="text-gray-500">({tour.reviews})</span>
+                      <div className="p-4 md:col-span-2">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <Star className="h-5 w-5 text-yellow-400" />
+                            <span className="font-semibold">{tour.rating.toFixed(1)}</span>
+                            <span className="text-gray-500">({tour.reviews})</span>
+                          </div>
+                          <div className="text-gray-500">
+                            {tour.capacity.current}/{tour.capacity.total}
+                          </div>
                         </div>
-                        <div className="text-gray-500">
-                          {tour.capacity.current}/{tour.capacity.total}
+                        <h3 className="text-xl font-bold mb-2">{tour.name}</h3>
+                        <p className="text-gray-600 mb-4">{tour.description}</p>
+                        <div className="flex items-center gap-4 text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>{tour.duration}</span>
+                          </div>
+                          <div>Free Cancellation</div>
                         </div>
+                        <div className="text-2xl font-bold text-blue-600 mt-2">THB {tour.price.toLocaleString()}</div>
                       </div>
-                      <h3 className="text-xl font-bold mb-2">{tour.name}</h3>
-                      <p className="text-gray-600 mb-4">{tour.description}</p>
-                      <div className="flex items-center gap-4 text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>{tour.duration}</span>
-                        </div>
-                        <div>Free Cancellation</div>
-                      </div>
-                      <div className="text-2xl font-bold text-blue-600 mt-2">THB {tour.price.toLocaleString()}</div>
                     </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-10 border rounded-lg">
-                <p className="text-xl text-gray-500">ไม่พบทัวร์ที่ตรงกับเงื่อนไขการค้นหา</p>
-                <p className="text-gray-500 mt-2">กรุณาลองปรับเปลี่ยนตัวกรองใหม่</p>
-              </div>
-            )}
-          </div>
+                  </motion.div>
+                ))
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-center py-10 border rounded-lg"
+                >
+                  <p className="text-xl text-gray-500">ไม่พบทัวร์ที่ตรงกับเงื่อนไขการค้นหา</p>
+                  <p className="text-gray-500 mt-2">กรุณาลองปรับเปลี่ยนตัวกรองใหม่</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
 
-      <footer className="bg-[#2D776E] text-white py-8 w-full mt-8">
+      <motion.footer
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="bg-[#2D776E] text-white py-8 w-full mt-8"
+      >
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <Image src="/logoW.png" alt="PETI Logo" width={170} height={90} />
@@ -354,15 +397,16 @@ const Package = () => {
             </div>
 
             <div className="flex gap-4">
-              <Facebook className="w-6 h-6" />
-              <Instagram className="w-6 h-6" />
-              <MessageCircle className="w-6 h-6" />
-              <Twitter className="w-6 h-6" />
+              {[Facebook, Instagram, MessageCircle, Twitter].map((Icon, index) => (
+                <motion.div key={index} whileHover={{ scale: 1.2, rotate: 5 }} whileTap={{ scale: 0.9 }}>
+                  <Icon className="w-6 h-6" />
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
-      </footer>
-    </div>
+      </motion.footer>
+    </motion.div>
   )
 }
 
