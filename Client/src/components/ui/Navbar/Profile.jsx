@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CircleUserRound, ChevronDown, LogOut } from "lucide-react";
 import {
@@ -15,10 +15,18 @@ import { links } from "@/utils/links";
 
 const Profile = () => {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("auth.jwt");
+    setIsLoggedIn(!!token); 
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // หรือล้าง session ตามที่ใช้
-    router.push("/login"); // กลับไปหน้า Login
+    sessionStorage.removeItem("auth.jwt");
+    setIsLoggedIn(false);
+    window.location.reload(); 
   };
 
   return (
@@ -36,18 +44,41 @@ const Profile = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>User</DropdownMenuLabel>
+          <DropdownMenuLabel>{isLoggedIn ? "User" : "Hi, Guest"}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {links.map((item, index) => (
-            <DropdownMenuItem key={index}>
-              <a href={item.href}>{item.label}</a>
-            </DropdownMenuItem>
-          ))}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} className="text-red-500">
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </DropdownMenuItem>
+          {isLoggedIn ? (
+            <>
+              {links.map((item, index) => (
+                <DropdownMenuItem key={index}>
+                  <a href={item.href}>{item.label}</a>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-red-500">
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <>
+              <DropdownMenuItem>
+                <button 
+                  onClick={() => router.push('/register')}
+                  className="w-4 text-left py-1.5 hover:bg-gray-100"
+                >
+                  Register
+                </button>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <button
+                  onClick={() => router.push('/login')}
+                  className="w-full text-left py-1.5 hover:bg-gray-100"
+                >
+                  Login
+                </button>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
