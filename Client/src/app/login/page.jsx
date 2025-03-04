@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Facebook } from "lucide-react";
+import conf from "../../../conf";
 
 const Login = () => {
   const { register, handleSubmit, setError, formState: { errors }, } = useForm();
@@ -13,7 +14,7 @@ const Login = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:1337/api/auth/local", {
+      const response = await fetch(`${conf.apiPrefix}/api/auth/local`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -369,6 +369,41 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiHistoryPackageHistoryPackage
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'history_packages';
+  info: {
+    description: '';
+    displayName: 'History_Package';
+    pluralName: 'history-packages';
+    singularName: 'history-package';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Date: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::history-package.history-package'
+    > &
+      Schema.Attribute.Private;
+    Number: Schema.Attribute.Integer;
+    price: Schema.Attribute.Decimal;
+    publishedAt: Schema.Attribute.DateTime;
+    special: Schema.Attribute.String;
+    title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    username: Schema.Attribute.String;
+  };
+}
+
 export interface ApiPackagePackage extends Struct.CollectionTypeSchema {
   collectionName: 'packages';
   info: {
@@ -400,6 +435,8 @@ export interface ApiPackagePackage extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     price: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
+    specials: Schema.Attribute.String;
+    timeOfTour: Schema.Attribute.String;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -407,74 +444,34 @@ export interface ApiPackagePackage extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiRecommendedPakageRecommendedPakage
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'recommended_pakages';
+export interface ApiPaymentPayment extends Struct.CollectionTypeSchema {
+  collectionName: 'payments';
   info: {
     description: '';
-    displayName: 'RecommendedPackage';
-    pluralName: 'recommended-pakages';
-    singularName: 'recommended-pakage';
+    displayName: 'payment';
+    pluralName: 'payments';
+    singularName: 'payment';
   };
   options: {
-    draftAndPublish: false;
+    draftAndPublish: true;
   };
   attributes: {
-    capacity: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    duration: Schema.Attribute.String;
-    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    isSellOut: Schema.Attribute.Boolean;
+    emaill: Schema.Attribute.Email;
+    lastname: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::recommended-pakage.recommended-pakage'
+      'api::payment.payment'
     > &
       Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    phone: Schema.Attribute.String;
     price: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
-    rating: Schema.Attribute.Integer;
-    reviews: Schema.Attribute.Integer;
-    title: Schema.Attribute.String;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiSpecialOfferSpecialOffer
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'special_offers';
-  info: {
-    description: '';
-    displayName: 'SpecialOffer';
-    pluralName: 'special-offers';
-    singularName: 'special-offer';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    capacity: Schema.Attribute.String;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    duration: Schema.Attribute.String;
-    image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    isSellOut: Schema.Attribute.Boolean;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::special-offer.special-offer'
-    > &
-      Schema.Attribute.Private;
-    price: Schema.Attribute.Integer;
-    publishedAt: Schema.Attribute.DateTime;
-    rating: Schema.Attribute.Integer;
-    reviews: Schema.Attribute.Integer;
-    title: Schema.Attribute.String;
+    slip: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -990,9 +987,9 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::history-package.history-package': ApiHistoryPackageHistoryPackage;
       'api::package.package': ApiPackagePackage;
-      'api::recommended-pakage.recommended-pakage': ApiRecommendedPakageRecommendedPakage;
-      'api::special-offer.special-offer': ApiSpecialOfferSpecialOffer;
+      'api::payment.payment': ApiPaymentPayment;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

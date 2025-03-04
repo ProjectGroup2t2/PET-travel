@@ -1,139 +1,27 @@
-"use client"
+// Package.js
+"use client";
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { Calendar, Star } from "lucide-react"
-import { Facebook, Instagram, MessageCircle, Twitter } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-
-// Mock data for tours
-const mockTours = [
-  {
-    id: 1,
-    name: "ภูเก็ต",
-    image: "/placeholder.svg?height=400&width=600",
-    description:
-      "เมืองท่าภูเก็ตเป็นสถานที่ที่เต็มไปด้วยประวัติศาสตร์และเสน่ห์เฉพาะตัว อาคารบ้านเรือนในย่านเมืองเก่าของภูเก็ตมีสไตล์ชิโน-โปรตุกีส (Sino-Portuguese) ซึ่งผสมผสานระหว่างสถาปัตยกรรมยุโรปและจีนไว้อย่างลงตัว จุดเด่นคือคนที่นี่เป็นมิตรต่อการสัมผัสใกล้ ร้านค้าทำเก่าแก่ และบรรยากาศที่ย้อนยุค",
-    rating: 4.0,
-    reviews: 204,
-    capacity: { current: 50, total: 60 },
-    duration: "2 วัน 1 คืน",
-    price: 3500,
-    timeOfTour: ["morning", "all-day"],
-    specials: ["halal", "english", "private"],
-  },
-  {
-    id: 2,
-    name: "เชียงใหม่",
-    image: "/placeholder.svg?height=400&width=600",
-    description:
-      "เชียงใหม่เป็นเมืองที่มีเสน่ห์ทางวัฒนธรรมล้านนา มีวัดเก่าแก่มากมาย อาหารอร่อย และธรรมชาติที่สวยงาม เหมาะสำหรับการพักผ่อนและสัมผัสวิถีชีวิตท้องถิ่น",
-    rating: 4.5,
-    reviews: 350,
-    capacity: { current: 30, total: 40 },
-    duration: "3 วัน 2 คืน",
-    price: 5500,
-    timeOfTour: ["afternoon", "all-day"],
-    specials: ["english", "kids", "pickup"],
-  },
-  {
-    id: 3,
-    name: "กระบี่",
-    image: "/placeholder.svg?height=400&width=600",
-    description: "กระบี่มีชายหาดที่สวยงาม น้ำทะเลใสสีฟ้า เหมาะสำหรับการดำน้ำและกิจกรรมทางน้ำ มีเกาะน้อยใหญ่มากมายให้ท่องเที่ยว",
-    rating: 4.8,
-    reviews: 280,
-    capacity: { current: 25, total: 30 },
-    duration: "2 วัน 1 คืน",
-    price: 4200,
-    timeOfTour: ["morning"],
-    specials: ["halal", "kids", "private"],
-  },
-  {
-    id: 4,
-    name: "พัทยา",
-    image: "/placeholder.svg?height=400&width=600",
-    description: "พัทยาเป็นเมืองท่องเที่ยวยอดนิยมที่มีชายหาดสวยงาม กิจกรรมทางน้ำมากมาย และแหล่งบันเทิงครบครัน",
-    rating: 3.9,
-    reviews: 420,
-    capacity: { current: 80, total: 100 },
-    duration: "1 วัน",
-    price: 1500,
-    timeOfTour: ["morning", "afternoon"],
-    specials: ["english", "pickup"],
-  },
-]
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar, Star } from 'lucide-react';
+import Footer from '../footer/page';
+import { usePackages } from '../../Hooks/usePackages';
+import TourCard from './TourCard';
 
 const Package = () => {
-  // Filter states
-  const [dateRange, setDateRange] = useState("")
-  const [priceRange, setPriceRange] = useState(10000)
-  const [ratingFilter, setRatingFilter] = useState(0)
-  const [timeFilters, setTimeFilters] = useState({
-    morning: false,
-    afternoon: false,
-    allDay: false,
-  })
-  const [specialFilters, setSpecialFilters] = useState({
-    halal: false,
-    english: false,
-    kids: false,
-    private: false,
-    pickup: false,
-  })
-
-  const [filteredTours, setFilteredTours] = useState(mockTours)
-
-  useEffect(() => {
-    let result = mockTours
-
-    result = result.filter((tour) => tour.price <= priceRange)
-
-    if (ratingFilter > 0) {
-      result = result.filter((tour) => tour.rating >= ratingFilter)
-    }
-
-    const activeTimeFilters = Object.entries(timeFilters)
-      .filter(([_, isActive]) => isActive)
-      .map(([key]) => key)
-
-    if (activeTimeFilters.length > 0) {
-      result = result.filter((tour) => {
-        return tour.timeOfTour.some((time) => {
-          if (time === "morning" && timeFilters.morning) return true
-          if (time === "afternoon" && timeFilters.afternoon) return true
-          if (time === "all-day" && timeFilters.allDay) return true
-          return false
-        })
-      })
-    }
-
-    const activeSpecialFilters = Object.entries(specialFilters)
-      .filter(([_, isActive]) => isActive)
-      .map(([key]) => key)
-
-    if (activeSpecialFilters.length > 0) {
-      result = result.filter((tour) => {
-        return activeSpecialFilters.every((special) => tour.specials.includes(special))
-      })
-    }
-
-    setFilteredTours(result)
-  }, [priceRange, ratingFilter, timeFilters, specialFilters])
-
-  const handleTimeFilterChange = (filter) => {
-    setTimeFilters((prev) => ({
-      ...prev,
-      [filter]: !prev[filter],
-    }))
-  }
-
-  const handleSpecialFilterChange = (filter) => {
-    setSpecialFilters((prev) => ({
-      ...prev,
-      [filter]: !prev[filter],
-    }))
-  }
+  const {
+    dateRange,
+    setDateRange,
+    priceRange,
+    setPriceRange,
+    ratingFilter,
+    setRatingFilter,
+    timeFilters,
+    handleTimeFilterChange,
+    specialFilters,
+    handleSpecialFilterChange,
+    filteredPackages,
+    loading,
+  } = usePackages();
 
   return (
     <motion.div
@@ -160,6 +48,7 @@ const Package = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="space-y-6"
           >
+            {/* Date Filter */}
             <div className="border rounded-lg p-4">
               <h2 className="font-semibold mb-4">When are you traveling?</h2>
               <div className="relative">
@@ -174,6 +63,7 @@ const Package = () => {
               </div>
             </div>
 
+            {/* Price Filter */}
             <div className="border rounded-lg p-4">
               <h2 className="font-semibold mb-4">Price</h2>
               <input
@@ -190,6 +80,7 @@ const Package = () => {
               </div>
             </div>
 
+            {/* Rating Filter */}
             <div className="border rounded-lg p-4">
               <h2 className="font-semibold mb-4">Rating</h2>
               <div className="space-y-2">
@@ -214,6 +105,7 @@ const Package = () => {
               </div>
             </div>
 
+            {/* Time Filter */}
             <div className="border rounded-lg p-4">
               <h2 className="font-semibold mb-4">Time of Tour</h2>
               <div className="space-y-2">
@@ -256,6 +148,7 @@ const Package = () => {
               </div>
             </div>
 
+            {/* Special Filters */}
             <div className="border rounded-lg p-4">
               <h2 className="font-semibold mb-4">Specials</h2>
               <div className="space-y-2">
@@ -311,7 +204,7 @@ const Package = () => {
             className="md:col-span-3 space-y-6"
           >
             <div className="flex justify-between items-center mb-4">
-              <div>{filteredTours.length} results</div>
+              <div>{filteredPackages.length} results</div>
               <select className="border rounded-md p-2">
                 <option>Featured</option>
                 <option>Price: Low to High</option>
@@ -320,49 +213,18 @@ const Package = () => {
               </select>
             </div>
 
-            {/* Tour Cards */}
-            <AnimatePresence>
-              {filteredTours.length > 0 ? (
-                filteredTours.map((tour, index) => (
-                  <motion.div
-                    key={tour.id}
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -50 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="border rounded-lg overflow-hidden"
-                  >
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div className="relative h-64 md:h-full">
-                        <Image src="/1.jpg" alt={`${tour.name} tour image`} fill className="object-cover" />
-                      </div>
+            {loading && (
+              <div className="text-center py-10">
+                <p className="text-xl text-gray-500">กำลังโหลดข้อมูล...</p>
+              </div>
+            )}
 
-                      <div className="p-4 md:col-span-2">
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="flex items-center gap-2">
-                            <Star className="h-5 w-5 text-yellow-400" />
-                            <span className="font-semibold">{tour.rating.toFixed(1)}</span>
-                            <span className="text-gray-500">({tour.reviews})</span>
-                          </div>
-                          <div className="text-gray-500">
-                            {tour.capacity.current}/{tour.capacity.total}
-                          </div>
-                        </div>
-                        <h3 className="text-xl font-bold mb-2">{tour.name}</h3>
-                        <p className="text-gray-600 mb-4">{tour.description}</p>
-                        <div className="flex items-center gap-4 text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>{tour.duration}</span>
-                          </div>
-                          <div>Free Cancellation</div>
-                        </div>
-                        <div className="text-2xl font-bold text-blue-600 mt-2">THB {tour.price.toLocaleString()}</div>
-                      </div>
-                    </div>
-                  </motion.div>
+            <AnimatePresence>
+              {!loading && filteredPackages.length > 0 ? (
+                filteredPackages.map((tour, index) => (
+                  <TourCard key={tour.id} tour={tour} index={index} />
                 ))
-              ) : (
+              ) : !loading && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -379,39 +241,9 @@ const Package = () => {
         </div>
       </div>
 
-      <motion.footer
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="bg-[#2D776E] text-white py-8 w-full mt-8"
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <Image src="/logoW.png" alt="PETI Logo" width={170} height={90} />
-
-            <div className="text-center">
-              <p className="font-semibold">Contact us</p>
-              <p>yimwired@gmail.com</p>
-            </div>
-
-            <div className="text-center">
-              <p className="font-semibold">About</p>
-              <p>@PET2025</p>
-            </div>
-
-            <div className="flex gap-4">
-              {[Facebook, Instagram, MessageCircle, Twitter].map((Icon, index) => (
-                <motion.div key={index} whileHover={{ scale: 1.2, rotate: 5 }} whileTap={{ scale: 0.9 }}>
-                  <Icon className="w-6 h-6" />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </motion.footer>
+      <Footer />
     </motion.div>
-  )
-}
+  );
+};
 
-export default Package
-
+export default Package;

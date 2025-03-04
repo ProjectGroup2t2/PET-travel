@@ -1,3 +1,4 @@
+// Profile.jsx
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
@@ -13,11 +14,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { links } from "@/utils/links";
 
-const Profile = () => {
+const Profile = ({ user, onLogout }) => {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // หรือล้าง session ตามที่ใช้
+    onLogout(); // เรียกฟังก์ชัน logout จาก parent (Navbar)
     router.push("/login"); // กลับไปหน้า Login
   };
 
@@ -36,7 +37,9 @@ const Profile = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>User</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            {user?.username || user?.email || "User"}
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           {links.map((item, index) => (
             <DropdownMenuItem key={index}>
