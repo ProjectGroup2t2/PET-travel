@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useContext } from "react";
 import { useRouter } from "next/navigation";
 import { CircleUserRound, ChevronDown, LogOut } from "lucide-react";
 import {
@@ -12,20 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { links } from "@/utils/links";
+import { AuthContext } from "@/context/Auth.context"; 
 
 const Profile = () => {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-
-  useEffect(() => {
-    const token = sessionStorage.getItem("auth.jwt");
-    setIsLoggedIn(!!token); 
-  }, []);
+  const { state, logout } = useContext(AuthContext);
 
   const handleLogout = () => {
-    sessionStorage.removeItem("auth.jwt");
-    setIsLoggedIn(false);
+    logout(); 
     window.location.reload(); 
   };
 
@@ -44,9 +38,11 @@ const Profile = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>{isLoggedIn ? "User" : "Hi, Guest"}</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            {"Hi, " + (state.isLoggedIn ? state.user?.username : "Guest")}
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {isLoggedIn ? (
+          {state.isLoggedIn ? (
             <>
               {links.map((item, index) => (
                 <DropdownMenuItem key={index}>
@@ -62,16 +58,16 @@ const Profile = () => {
           ) : (
             <>
               <DropdownMenuItem>
-                <button 
-                  onClick={() => router.push('/register')}
-                  className="w-4 text-left py-1.5 hover:bg-gray-100"
+                <button
+                  onClick={() => router.push("/register")}
+                  className="w-full text-left py-1.5 hover:bg-gray-100"
                 >
                   Register
                 </button>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <button
-                  onClick={() => router.push('/login')}
+                  onClick={() => router.push("/login")}
                   className="w-full text-left py-1.5 hover:bg-gray-100"
                 >
                   Login
