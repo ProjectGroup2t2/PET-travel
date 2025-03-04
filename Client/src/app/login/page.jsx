@@ -1,50 +1,39 @@
 "use client";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Facebook } from "lucide-react";
+import { AuthContext } from "@/context/Auth.context";
 
 const Login = () => {
-  const { register, handleSubmit, setError, formState: { errors }, } = useForm();
+  const { register, handleSubmit, setError, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login, state } = useContext(AuthContext);
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    try {
-      const response = await fetch("http://localhost:1337/api/auth/local", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          identifier: data.username,
-          password: data.password,
-        }),
-      });
-  
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error.message);
-      }
-  
-      const userRole = result.user.roles || "User"; 
-  
-      localStorage.setItem("jwt", result.jwt);
-      localStorage.setItem("user", JSON.stringify(result.user));
-  
-      if (userRole.toLowerCase() === "admin") {
+  useEffect(() => {
+    if (state.isLoggedIn && state.user) {
+      const roles = state.user.roles || [];
+      const userRole = roles.includes('admin') ? 'admin' : 'user';
+      if (userRole === "admin") {
         router.push("/admin");
       } else {
         router.push("/");
       }
+    }
+  }, [state.isLoggedIn, state.user, router]);
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      await login(data.username, data.password);
     } catch (error) {
-      setError("username", { type: "manual", message: error.message });
+      setError("username", { type: "manual", message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
     }
     setLoading(false);
   };
-  
+
   return (
     <div className="flex min-h-screen">
       <div className="hidden lg:flex w-1/2 relative">
@@ -62,19 +51,23 @@ const Login = () => {
             <input
               type="text"
               placeholder="USERNAME"
-              {...register("username", { required: "Username is required" })}
+              {...register("username", { required: "กรุณากรอกชื่อผู้ใช้" })}
               className="w-80 p-3 border rounded-full"
             />
             {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
             <input
               type="password"
               placeholder="PASSWORD"
-              {...register("password", { required: "Password is required" })}
+              {...register("password", { required: "กรุณากรอกรหัสผ่าน" })}
               className="w-80 p-3 border rounded-full"
             />
             {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
-            <button type="submit" disabled={loading} className="w-80 bg-[#2D776E] text-white p-3 rounded-full">
-              {loading ? "Logging in..." : "LOGIN"}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-80 bg-[#2D776E] text-white p-3 rounded-full"
+            >
+              {loading ? "กำลังเข้าสู่ระบบ..." : "LOGIN"}
             </button>
           </form>
           <div className="w-full flex items-center justify-center my-4">
