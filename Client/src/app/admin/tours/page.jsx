@@ -4,6 +4,9 @@ import { AdminHeader } from "@/components/ui/admin/header"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { AuthContext } from "@/context/Auth.context"
+import { useRouter } from "next/navigation"
+import { useState, useContext, useEffect } from "react"
 
 export default function ToursPage() {
   const tours = [
@@ -12,17 +15,35 @@ export default function ToursPage() {
     { id: 3, name: "เกาะไม้ท่อน", price: "THB 3,990", image: "/2.jpg" },
   ]
 
+  const { state } = useContext(AuthContext) 
+  const router = useRouter()
+    
+  useEffect(() => {
+    if (state.isLoggedIn && state.user) {
+      const roles = state.user.roles || []
+      if (!roles.includes("admin")) {
+        router.push("/") 
+      }
+    } else if (!state.isLoggedIn) {
+      router.push("/login") 
+    }
+  }, [state.isLoggedIn, state.user, router])
+
+  if (!state.isLoggedIn || !state.user || !state.user.roles?.includes("admin")) {
+    return null 
+  }
+
   return (
     <div className="flex-1">
       <AdminHeader title="Tours Management" />
 
-      {/* Main Content */}
+
       <div className="p-8">
         <h2 className="text-2xl font-semibold text-[#2A8470] mb-6">Add Tour</h2>
 
-        {/* Grid of Tours */}
+  
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Tour Cards */}
+
           {tours.map((tour) => (
             <div
               key={tour.id}
@@ -42,7 +63,7 @@ export default function ToursPage() {
             </div>
           ))}
 
-          {/* Add Tour Card */}
+
           <Link href="/admin/tours/add">
             <div className="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 hover:border-[#2A8470] transition-colors cursor-pointer min-h-[280px]">
               <Plus className="h-8 w-8 text-gray-400 mb-2" />

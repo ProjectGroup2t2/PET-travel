@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { AuthContext } from "@/context/Auth.context"
+import { useRouter } from "next/navigation"
+import { useState, useContext, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { AdminHeader } from "@/components/ui/admin/header"
@@ -8,6 +10,24 @@ import { Plus, Star, Clock, Users } from "lucide-react"
 
 export default function Package() {
   const [tourCards, setTourCards] = useState([])
+  const { state } = useContext(AuthContext) 
+  const router = useRouter()
+    
+  useEffect(() => {
+    if (state.isLoggedIn && state.user) {
+      const roles = state.user.roles || []
+      if (!roles.includes("admin")) {
+        router.push("/") 
+      }
+    } else if (!state.isLoggedIn) {
+      router.push("/login") 
+    }
+  }, [state.isLoggedIn, state.user, router])
+
+  if (!state.isLoggedIn || !state.user || !state.user.roles?.includes("admin")) {
+    return null 
+  }
+
 
   useEffect(() => {
     const fetchData = async () => {

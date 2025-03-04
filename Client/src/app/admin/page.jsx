@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useContext, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { ChevronDown } from "lucide-react"
 import { AdminHeader } from "@/components/ui/admin/header"
 import { Button } from "@/components/ui/button"
+import { AuthContext } from "@/context/Auth.context"
 
 export default function AdminDashboard() {
   const [dateRange, setDateRange] = useState({
@@ -16,6 +18,20 @@ export default function AdminDashboard() {
     customers: "jan",
     bookings: "jan",
   })
+
+  const { state } = useContext(AuthContext) 
+  const router = useRouter()
+
+  useEffect(() => {
+    if (state.isLoggedIn && state.user) {
+      const roles = state.user.roles || []
+      if (!roles.includes("admin")) {
+        router.push("/") 
+      }
+    } else if (!state.isLoggedIn) {
+      router.push("/login") 
+    }
+  }, [state.isLoggedIn, state.user, router])
 
   const months = [
     { value: "jan", label: "January" },
@@ -31,6 +47,11 @@ export default function AdminDashboard() {
     { value: "nov", label: "November" },
     { value: "dec", label: "December" },
   ]
+
+
+  if (!state.isLoggedIn || !state.user || !state.user.roles?.includes("admin")) {
+    return null 
+  }
 
   return (
     <div className="flex-1 bg-gray-50">
