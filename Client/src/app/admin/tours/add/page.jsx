@@ -1,152 +1,142 @@
-"use client"
+"use client";
 
-import { AuthContext } from "@/context/Auth.context"
-import { useRouter } from "next/navigation"
-import { useState, useContext, useEffect } from "react"
-import { AdminHeader } from "@/components/ui/admin/header"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { X, Upload, Loader2 } from "lucide-react"
-import { toast } from "sonner"
+import { AuthContext } from "@/context/Auth.context";
+import { useRouter } from "next/navigation";
+import { useState, useContext, useEffect } from "react";
+import { AdminHeader } from "@/components/ui/admin/header";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { X, Upload, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AddTourPage() {
-  const { state } = useContext(AuthContext)
-  const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { state } = useContext(AuthContext);
+  const router = useRouter();
   const [tourData, setTourData] = useState({
-    tourname: "",
+    title: "",
     price: "",
     description: "",
     duration: "",
+    capacity_max: "",
     capacity: "",
-    capacitymax: "",
-  })
-
-  const [images, setImages] = useState([])
-  const [imagePreviews, setImagePreviews] = useState([])
-  const [isAdmin, setIsAdmin] = useState(false)
+  });
+  
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (state.isLoggedIn && state.user) {
-      const roles = state.user.roles || []
-      setIsAdmin(roles.includes("admin"))
+      const roles = state.user.roles || [];
+      setIsAdmin(roles.includes("admin"));
       if (!roles.includes("admin")) {
-        router.push("/")
+        router.push("/");
       }
     } else if (!state.isLoggedIn) {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [state.isLoggedIn, state.user, router])
+  }, [state.isLoggedIn, state.user, router]);
 
   if (!state.isLoggedIn || !isAdmin) {
-    return null
+    return null;
   }
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files)
-
+    const files = Array.from(e.target.files);
     if (files.length > 0) {
-      // Add new files to existing images
-      setImages((prevImages) => [...prevImages, ...files])
-
-      // Create previews for new files
-      const newPreviews = files.map((file) => URL.createObjectURL(file))
-      setImagePreviews((prevPreviews) => [...prevPreviews, ...newPreviews])
+      setImages((prevImages) => [...prevImages, ...files]);
+      const newPreviews = files.map((file) => URL.createObjectURL(file));
+      setImagePreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
     }
-  }
+  };
 
   const removeImage = (index) => {
-    // Remove image and preview at the specified index
-    setImages((prevImages) => prevImages.filter((_, i) => i !== index))
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    URL.revokeObjectURL(imagePreviews[index]);
+    setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index));
+  };
 
-    // Revoke the object URL to avoid memory leaks
-    URL.revokeObjectURL(imagePreviews[index])
-    setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== index))
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+    setSuccess(false);
 
-  const uploadImagesToStrapi = async () => {
-    if (images.length === 0) return []
+    try {
+      const formData = new FormData();
 
-    const uploadPromises = images.map(async (image) => {
-      const formData = new FormData()
-      formData.append("files", image)
+      formData.append("data", JSON.stringify({
+        title: tourData.title || "",
+        price: parseFloat(tourData.price) || 0,
+        duration: tourData.duration || "",
+        capacity_max: parseInt(tourData.capacity_max) || 0,
+        capacity: parseInt(tourData.capacity) || 0,
+        description: tourData.description
+          ? [
+              {
+                type: "paragraph",
+                children: [{ type: "text", text: tourData.description }],
+              },
+            ]
+          : null,
+      }));
 
-      try {
-        // Use the token from AuthContext
-        const response = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/upload`, {
+      images.forEach((image, index) => {
+        formData.append(`files.images`, image); 
+      });
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/packages`,
+        {
           method: "POST",
           body: formData,
           headers: {
             Authorization: state.user?.token ? `Bearer ${state.user.token}` : "",
           },
-        })
-
-        if (!response.ok) {
-          console.error("Upload response:", await response.text())
-          throw new Error(`Upload failed with status: ${response.status}`)
         }
-
-        const data = await response.json()
-        return data[0].id // Return the ID of the uploaded image
-      } catch (error) {
-        console.error("Error uploading image:", error)
-        throw error
-      }
-    })
-
-    return Promise.all(uploadPromises)
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    try {
-      // 1. Upload images to Strapi
-      const imageIds = await uploadImagesToStrapi()
-
-      // 2. Create tour with image references
-      const response = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/packages`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: state.user?.token ? `Bearer ${state.user.token}` : "",
-        },
-        body: JSON.stringify({
-          data: {
-            ...tourData,
-            price: Number.parseFloat(tourData.price),
-            capacity: Number.parseInt(tourData.capacity, 10),
-            capacitymax: Number.parseInt(tourData.capacitymax, 10),
-            images: imageIds.length > 0 ? { connect: imageIds } : undefined,
-          },
-        }),
-      })
+      );
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error("Create tour error:", errorText)
-        throw new Error(`Failed to create tour: ${response.status}`)
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || `Failed with status ${response.status}`);
       }
 
-      // Success! Redirect to tours page
+      const data = await response.json();
+      console.log("Response data:", data);
+
+      setSuccess(true);
       toast({
         title: "Success!",
         description: "Tour has been created successfully.",
         variant: "success",
-      })
-      router.push("/admin/tours")
-    } catch (error) {
-      console.error("Error creating tour:", error)
+      });
+      
+      // รีเซ็ตฟอร์ม
+      setTourData({
+        title: "",
+        price: "",
+        description: "",
+        duration: "",
+        capacity_max: "",
+        capacity: "",
+      });
+      setImages([]);
+      setImagePreviews([]);
+
+    } catch (err) {
+      setError(err.message);
       toast({
         title: "Error",
-        description: "Failed to create tour. Please try again.",
+        description: `Failed to create tour: ${err.message}`,
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="flex-1">
@@ -155,7 +145,11 @@ export default function AddTourPage() {
       <div className="p-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-[#2A8470]">Add Tours</h2>
-          <Button onClick={handleSubmit} className="bg-[#2A8470] hover:bg-[#236657]" disabled={isSubmitting}>
+          <Button
+            onClick={handleSubmit}
+            className="bg-[#2A8470] hover:bg-[#236657]"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -167,16 +161,21 @@ export default function AddTourPage() {
           </Button>
         </div>
 
+        {success && (
+          <p className="text-green-600 mb-4">เพิ่มทัวร์สำเร็จ!</p>
+        )}
+        {error && (
+          <p className="text-red-600 mb-4">เกิดข้อผิดพลาด: {error}</p>
+        )}
+
         <div className="bg-white rounded-2xl p-8 shadow-sm">
-          {/* Multiple Image Upload Section */}
           <div className="mb-8">
             <label className="block text-sm font-medium mb-2">Tour Images</label>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
-              {/* Display image previews */}
               {imagePreviews.map((preview, index) => (
                 <div key={index} className="relative rounded-lg overflow-hidden border h-40">
                   <img
-                    src={preview || "/placeholder.svg"}
+                    src={preview}
                     alt={`Preview ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
@@ -184,15 +183,21 @@ export default function AddTourPage() {
                     type="button"
                     onClick={() => removeImage(index)}
                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    disabled={isSubmitting}
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               ))}
-
-              {/* Add image button */}
               <label className="border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center p-4 h-40 cursor-pointer hover:border-[#2A8470] transition-colors">
-                <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" multiple />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                  multiple
+                  disabled={isSubmitting}
+                />
                 <Upload className="h-8 w-8 text-gray-400 mb-2" />
                 <p className="text-gray-500 text-sm text-center">Upload images</p>
                 <p className="text-xs text-gray-400 text-center mt-1">Click to browse</p>
@@ -200,20 +205,18 @@ export default function AddTourPage() {
             </div>
           </div>
 
-          {/* ฟอร์มกรอกข้อมูลทัวร์ */}
           <div className="space-y-6">
             <div className="space-y-4">
-              {/* ชื่อทัวร์ */}
               <div>
                 <label className="block text-sm font-medium mb-2">Tour Name</label>
                 <Input
-                  value={tourData.tourname}
-                  onChange={(e) => setTourData((prev) => ({ ...prev, tourname: e.target.value }))}
+                  value={tourData.title}
+                  onChange={(e) => setTourData((prev) => ({ ...prev, title: e.target.value }))}
                   placeholder="Enter tour name"
+                  disabled={isSubmitting}
                 />
               </div>
 
-              {/* ราคา */}
               <div>
                 <label className="block text-sm font-medium mb-2">Price (THB)</label>
                 <Input
@@ -221,39 +224,40 @@ export default function AddTourPage() {
                   onChange={(e) => setTourData((prev) => ({ ...prev, price: e.target.value }))}
                   placeholder="Enter price"
                   type="number"
+                  disabled={isSubmitting}
                 />
               </div>
 
-              {/* ระยะเวลา */}
               <div>
                 <label className="block text-sm font-medium mb-2">Duration</label>
                 <Input
                   value={tourData.duration}
                   onChange={(e) => setTourData((prev) => ({ ...prev, duration: e.target.value }))}
-                  placeholder="Enter Duration (e.g., 3 วัน 2 คืน)"
+                  placeholder="Enter duration (e.g., 2 วัน 1 คืน)"
+                  disabled={isSubmitting}
                 />
               </div>
 
-              {/* จำนวนคนในแพ็คเกจ */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Capacity (Current)</label>
-                  <Input
-                    type="number"
-                    value={tourData.capacity}
-                    onChange={(e) => setTourData((prev) => ({ ...prev, capacity: e.target.value }))}
-                    placeholder="Current capacity"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Capacity (Maximum)</label>
-                  <Input
-                    type="number"
-                    value={tourData.capacitymax}
-                    onChange={(e) => setTourData((prev) => ({ ...prev, capacitymax: e.target.value }))}
-                    placeholder="Maximum capacity"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Max Capacity</label>
+                <Input
+                  type="number"
+                  value={tourData.capacity_max}
+                  onChange={(e) => setTourData((prev) => ({ ...prev, capacity_max: e.target.value }))}
+                  placeholder="Enter max capacity"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Current Capacity</label>
+                <Input
+                  type="number"
+                  value={tourData.capacity}
+                  onChange={(e) => setTourData((prev) => ({ ...prev, capacity: e.target.value }))}
+                  placeholder="Enter current capacity"
+                  disabled={isSubmitting}
+                />
               </div>
 
               <div>
@@ -264,6 +268,7 @@ export default function AddTourPage() {
                   onChange={(e) => setTourData((prev) => ({ ...prev, description: e.target.value }))}
                   placeholder="Enter tour description"
                   rows={4}
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
@@ -271,6 +276,5 @@ export default function AddTourPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
