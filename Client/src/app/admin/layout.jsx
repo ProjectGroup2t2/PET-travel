@@ -12,7 +12,7 @@ export default function AdminLayout({ children }) {
 
   const handleLogout = () => {
     logout();
-    router.push("/login"); 
+    router.push("/"); 
   };
 
   return (

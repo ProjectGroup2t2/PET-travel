@@ -10,62 +10,86 @@ import { Plus, Star, Clock, Users } from "lucide-react"
 
 export default function Package() {
   const [tourCards, setTourCards] = useState([])
-  const { state } = useContext(AuthContext) 
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const { state } = useContext(AuthContext)
   const router = useRouter()
-    
+
   useEffect(() => {
     if (state.isLoggedIn && state.user) {
       const roles = state.user.roles || []
       if (!roles.includes("admin")) {
-        router.push("/") 
+        router.push("/")
       }
     } else if (!state.isLoggedIn) {
-      router.push("/login") 
+      router.push("/login")
     }
   }, [state.isLoggedIn, state.user, router])
 
-  if (!state.isLoggedIn || !state.user || !state.user.roles?.includes("admin")) {
-    return null 
-  }
-
-
   useEffect(() => {
-    const fetchData = async () => {
-      const data = [
-        {
-          id: 1,
-          image: "/1.jpg",
-          title: "ภูเก็ต",
-          rating: 4.0,
-          reviews: 204,
-          capacity: "50/60",
-          duration: "รายวัน",
-          price: "THB 5,590",
-          isSellOut: false,
-        },
-        {
-          id: 2,
-          image: "/login-pic.png",
-          title: "เกาะพีพีมาเล",
-          rating: 4.5,
-          reviews: 320,
-          capacity: "30/40",
-          duration: "3 วัน 2 คืน",
-          price: "THB 6,990",
-          isSellOut: true,
-        },
-      ]
-      setTourCards(data)
+    const fetchTours = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/packages?populate=*`
+        );
+        if (!response.ok) {
+          throw new Error("ไม่สามารถดึงข้อมูลแพ็คเกจได้")
+        }
+        const data = await response.json()
+
+        const formattedTours = data.data.map((tour) => ({
+          id: tour.id,
+          image: tour.attributes.images?.data?.[0]?.attributes?.url
+            ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${tour.attributes.images.data[0].attributes.url}`
+            : "/placeholder.svg",
+          title: tour.attributes.title || "ไม่มีชื่อ",
+          rating: tour.attributes.rating || 4.0,
+          reviews: tour.attributes.reviews || 0,
+          capacity: `${tour.attributes.capacity || 0}/${tour.attributes.capacity_max || 0}`,
+          duration: tour.attributes.duration || "ไม่ระบุ",
+          price: `THB ${tour.attributes.price?.toLocaleString() || "0"}`,
+          isSellOut: tour.attributes.capacity >= tour.attributes.capacity_max
+        }))
+
+        setTourCards(formattedTours)
+        setLoading(false)
+      } catch (err) {
+        setError(err.message)
+        setLoading(false)
+      }
     }
 
-    fetchData()
+    fetchTours()
   }, [])
 
-  if (!tourCards.length) return <div className="p-8">Loading...</div>
+  if (!state.isLoggedIn || !state.user || !state.user.roles?.includes("admin")) {
+    return null
+  }
+
+  if (loading) {
+    return (
+      <div className="flex-1">
+        <AdminHeader title="Packages Management" />
+        <div className="p-8">
+          <p className="text-xl text-gray-500">กำลังโหลดข้อมูล...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1">
+        <AdminHeader title="Packages Management" />
+        <div className="p-8">
+          <p className="text-xl text-red-500">เกิดข้อผิดพลาด: {error}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex-1">
-      {/* Header ของหน้า Packages Management */}
       <AdminHeader title="Packages Management" />
 
       <div className="p-8">
@@ -78,16 +102,14 @@ export default function Package() {
               href={`/admin/packages/${tour.id}`}
               className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
             >
-              {/* สำหรับรูปภาพ */}
               <div className="relative w-full h-48">
                 <Image
-                  src={tour.image || "/placeholder.svg"}
+                  src={tour.image}
                   alt={tour.title}
                   fill
                   className="object-cover"
                 />
               </div>
-              {/* ข้อมูลรายละเอียดการ์ด */}
               <div className="p-4 space-y-2">
                 <h3 className="text-lg font-semibold">{tour.title}</h3>
 
@@ -114,6 +136,14 @@ export default function Package() {
               </div>
             </Link>
           ))}
+          
+          {/* Add Package Card */}
+          <Link href="/admin/packages/add">
+            <div className="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 hover:border-[#2A8470] transition-colors cursor-pointer min-h-[280px]">
+              <Plus className="h-8 w-8 text-gray-400 mb-2" />
+              <p className="text-gray-500">Add new package</p>
+            </div>
+          </Link>
         </div>
       </div>
     </div>

@@ -42,12 +42,12 @@ export default function PackageDetail() {
     const tourData = {
       1: {
         image: "/1.jpg",
-        title: "เมืองเก่าภูเก็ต",
+        title: "ภูเก็ตเมืองเก่า",
         customerName: "สมชาย ใจดี",
         email: "somchai@example.com",
         phone: "081-234-5678",
         paymentStatus: "Paid", // Paid หรือ Unpaid
-        price: "THB X,XXX",
+        price: "THB 5,590",
       },
       2: {
         image: "/login-pic.png",
