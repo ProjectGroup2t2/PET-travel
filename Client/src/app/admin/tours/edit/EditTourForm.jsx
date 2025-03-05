@@ -1,30 +1,43 @@
-// pages/admin/tours/edit/EditTourForm.jsx
 "use client";
 
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { AdminHeader } from "@/components/ui/admin/header";
 import { useRouter } from "next/navigation";
 import { AuthContext } from "@/context/Auth.context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Save, ArrowLeft, X, Upload, Loader2 } from "lucide-react";
+import { Save, ArrowLeft, X, Upload, Loader2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 
 export default function EditTourForm({ initialTour, error: initialError, tourId }) {
   const { state } = useContext(AuthContext);
   const router = useRouter();
-  const [tour, setTour] = useState(initialTour);
+  const [tour, setTour] = useState({
+    ...initialTour,
+    isAvailable: initialTour.isAvailable ?? "Not Available",
+  });
   const [images, setImages] = useState(initialTour.images || []);
   const [imagePreviews, setImagePreviews] = useState(initialTour.images?.map((img) => img.url) || []);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(initialError);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setTour((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  // Sync state กับ initialTour เมื่อ props เปลี่ยน
+  useEffect(() => {
+    setTour({
+      ...initialTour,
+      isAvailable: initialTour.isAvailable ?? "Not Available",
+    });
+    setImages(initialTour.images || []);
+    setImagePreviews(initialTour.images?.map((img) => img.url) || []);
+  }, [initialTour]);
+
+  const handleChange = (name, value) => {
+    setTour((prev) => {
+      const newTour = { ...prev, [name]: value };
+      console.log("Updated tour:", newTour);
+      return newTour;
+    });
   };
 
   const handleImageChange = (e) => {
@@ -51,7 +64,6 @@ export default function EditTourForm({ initialTour, error: initialError, tourId 
 
     try {
       const formData = new FormData();
-
       formData.append("data", JSON.stringify({
         title: tour.title || "",
         price: parseFloat(tour.price) || 0,
@@ -59,37 +71,30 @@ export default function EditTourForm({ initialTour, error: initialError, tourId 
         capacity_max: parseInt(tour.capacity_max) || 0,
         capacity: parseInt(tour.capacity) || 0,
         description: tour.description
-          ? [
-              {
-                type: "paragraph",
-                children: [{ type: "text", text: tour.description }],
-              },
-            ]
+          ? [{ type: "paragraph", children: [{ type: "text", text: tour.description }] }]
           : null,
+        isAvailable: tour.isAvailable,
       }));
 
-      images.forEach((image, index) => {
+      images.forEach((image) => {
         if (image instanceof File) {
           formData.append(`files.images`, image);
         }
       });
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/packages/${tourId}`,
-        {
-          method: "PUT",
-          body: formData,
-          headers: {
-            Authorization: state.user?.token ? `Bearer ${state.user.token}` : "",
-          },
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/packages/${tourId}`, {
+        method: "PUT",
+        body: formData,
+        headers: {
+          Authorization: state.user?.token ? `Bearer ${state.user.token}` : "",
+        },
+      });
+
+      const data = await response.json();
+      console.log("Response from server:", data);
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          `ไม่สามารถอัพเดทข้อมูลทัวร์ได้: ${errorData.error?.message || "Unknown error"}`
-        );
+        throw new Error(`ไม่สามารถอัพเดทข้อมูลทัวร์ได้: ${data.error?.message || "Unknown error"}`);
       }
 
       toast({
@@ -181,7 +186,7 @@ export default function EditTourForm({ initialTour, error: initialError, tourId 
                 <Input
                   name="title"
                   value={tour.title}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("title", e.target.value)}
                   placeholder="Enter tour name"
                   disabled={submitting}
                 />
@@ -195,7 +200,7 @@ export default function EditTourForm({ initialTour, error: initialError, tourId 
                   name="price"
                   type="number"
                   value={tour.price}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("price", e.target.value)}
                   placeholder="Enter price"
                   disabled={submitting}
                 />
@@ -208,7 +213,7 @@ export default function EditTourForm({ initialTour, error: initialError, tourId 
                 <Input
                   name="duration"
                   value={tour.duration}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("duration", e.target.value)}
                   placeholder="Enter duration (e.g., 2 วัน 1 คืน)"
                   disabled={submitting}
                 />
@@ -222,7 +227,7 @@ export default function EditTourForm({ initialTour, error: initialError, tourId 
                   name="capacity_max"
                   type="number"
                   value={tour.capacity_max}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("capacity_max", e.target.value)}
                   placeholder="Enter max capacity"
                   disabled={submitting}
                 />
@@ -236,7 +241,7 @@ export default function EditTourForm({ initialTour, error: initialError, tourId 
                   name="capacity"
                   type="number"
                   value={tour.capacity}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("capacity", e.target.value)}
                   placeholder="Enter current capacity"
                   disabled={submitting}
                 />
@@ -249,12 +254,25 @@ export default function EditTourForm({ initialTour, error: initialError, tourId 
                 <textarea
                   name="description"
                   value={tour.description}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("description", e.target.value)}
                   placeholder="Enter tour description"
                   rows={4}
                   className="block w-full rounded-md border border-gray-300 p-2"
                   disabled={submitting}
                 />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  checked={tour.isAvailable === "Available"}
+                  onCheckedChange={(checked) =>
+                    handleChange("isAvailable", checked ? "Available" : "Not Available")
+                  }
+                  disabled={submitting}
+                />
+                <label className="text-sm font-medium text-gray-700">
+                  Open for Sale
+                </label>
               </div>
 
               <Button

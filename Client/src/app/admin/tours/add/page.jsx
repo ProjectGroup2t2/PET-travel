@@ -6,8 +6,9 @@ import { useState, useContext, useEffect } from "react";
 import { AdminHeader } from "@/components/ui/admin/header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Upload, Loader2 } from "lucide-react";
+import { X, Upload, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 
 export default function AddTourPage() {
   const { state } = useContext(AuthContext);
@@ -19,6 +20,7 @@ export default function AddTourPage() {
     duration: "",
     capacity_max: "",
     capacity: "",
+    isAvailable: "Not Available", // เริ่มต้นเป็น "Not Available" เหมือนใน EditTourForm
   });
   
   const [images, setImages] = useState([]);
@@ -27,6 +29,7 @@ export default function AddTourPage() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State สำหรับควบคุมการแสดง popup
 
   useEffect(() => {
     if (state.isLoggedIn && state.user) {
@@ -82,6 +85,7 @@ export default function AddTourPage() {
               },
             ]
           : null,
+        isAvailable: tourData.isAvailable, // ส่งค่าเป็น "Available" หรือ "Not Available"
       }));
 
       images.forEach((image, index) => {
@@ -108,23 +112,28 @@ export default function AddTourPage() {
       console.log("Response data:", data);
 
       setSuccess(true);
+      setShowSuccessPopup(true); // แสดง popup เมื่อสำเร็จ
       toast({
         title: "Success!",
         description: "Tour has been created successfully.",
         variant: "success",
       });
       
-      // รีเซ็ตฟอร์ม
-      setTourData({
-        title: "",
-        price: "",
-        description: "",
-        duration: "",
-        capacity_max: "",
-        capacity: "",
-      });
-      setImages([]);
-      setImagePreviews([]);
+      // รีเซ็ตฟอร์มหลังจาก 3 วินาที (หรือเมื่อปิด popup)
+      setTimeout(() => {
+        setTourData({
+          title: "",
+          price: "",
+          description: "",
+          duration: "",
+          capacity_max: "",
+          capacity: "",
+          isAvailable: "Not Available", // รีเซ็ตเป็น "Not Available"
+        });
+        setImages([]);
+        setImagePreviews([]);
+        setShowSuccessPopup(false); // ปิด popup หลังจากรีเซ็ต
+      }, 3000);
 
     } catch (err) {
       setError(err.message);
@@ -138,32 +147,45 @@ export default function AddTourPage() {
     }
   };
 
+  const handleSwitchChange = (checked) => {
+    setTourData((prev) => ({
+      ...prev,
+      isAvailable: checked ? "Available" : "Not Available",
+    }));
+  };
+
+  const handleClosePopup = () => {
+    setShowSuccessPopup(false);
+    // รีเซ็ตฟอร์มเมื่อปิด popup
+    setTourData({
+      title: "",
+      price: "",
+      description: "",
+      duration: "",
+      capacity_max: "",
+      capacity: "",
+      isAvailable: "Not Available",
+    });
+    setImages([]);
+    setImagePreviews([]);
+  };
+
   return (
     <div className="flex-1">
       <AdminHeader title="Tours Management" />
+      <div className="px-8 pt-6">
+        <button
+          onClick={() => router.push("/admin/tours")}
+          className="inline-flex items-center px-4 py-2 text-gray-600 hover:text-[#2A8470]"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          <span className="font-medium">Back to Tour List</span>
+        </button>
+      </div>
 
       <div className="p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-[#2A8470]">Add Tours</h2>
-          <Button
-            onClick={handleSubmit}
-            className="bg-[#2A8470] hover:bg-[#236657]"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              "SAVE"
-            )}
-          </Button>
-        </div>
+        <h2 className="text-2xl font-semibold text-[#2A8470] mb-6">Add Tours</h2>
 
-        {success && (
-          <p className="text-green-600 mb-4">เพิ่มทัวร์สำเร็จ!</p>
-        )}
         {error && (
           <p className="text-red-600 mb-4">เกิดข้อผิดพลาด: {error}</p>
         )}
@@ -271,10 +293,58 @@ export default function AddTourPage() {
                   disabled={isSubmitting}
                 />
               </div>
+
+              {/* ปรับปรุง Switch ให้เหมือนใน EditTourForm */}
+              <div className="flex items-center space-x-2">
+                <Switch
+                  checked={tourData.isAvailable === "Available"}
+                  onCheckedChange={handleSwitchChange}
+                  disabled={isSubmitting}
+                />
+                <label className="text-sm font-medium text-gray-700">
+                  Open for Sale
+                </label>
+              </div>
             </div>
+          </div>
+
+          {/* ปุ่ม SAVE ด้านล่าง */}
+          <div className="mt-8">
+            <Button
+              onClick={handleSubmit}
+              className="w-full bg-[#2A8470] hover:bg-[#236657]"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "SAVE"
+              )}
+            </Button>
           </div>
         </div>
       </div>
+
+      {/* Popup สำหรับแจ้งเตือนสำเร็จ */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4 text-green-600">สำเร็จ!</h3>
+            <p className="mb-6">เพิ่มทัวร์สำเร็จ!</p>
+            <div className="flex justify-end">
+              <Button
+                onClick={handleClosePopup}
+                className="bg-[#2A8470] hover:bg-[#236657] text-white"
+              >
+                ปิด
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

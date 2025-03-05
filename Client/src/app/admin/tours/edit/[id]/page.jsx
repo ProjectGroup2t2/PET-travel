@@ -1,4 +1,3 @@
-// pages/admin/tours/edit/[id].jsx
 import EditTourForm from "../EditTourForm";
 
 export default async function EditTourPage({ params }) {
@@ -9,6 +8,7 @@ export default async function EditTourPage({ params }) {
     duration: "",
     capacity_max: "",
     capacity: "",
+    isAvailable: "Not Available", // ค่าเริ่มต้นถ้าไม่พบใน API
     images: [],
   };
   let error = null;
@@ -40,11 +40,13 @@ export default async function EditTourPage({ params }) {
       duration: tourData.attributes.duration || "",
       capacity_max: tourData.attributes.capacity_max || "",
       capacity: tourData.attributes.capacity || "",
+      isAvailable: tourData.attributes.isAvailable || "Not Available", // เพิ่มฟิลด์นี้
       images: tourData.attributes.images?.data?.map((img) => ({
         id: img.id,
         url: `${process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"}${img.attributes.url}`,
       })) || [],
     };
+    console.log("Mapped initialTour:", initialTour);
   } catch (err) {
     error = err.message;
     console.error("Error fetching tour:", err);
