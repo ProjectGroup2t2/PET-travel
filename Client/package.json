@@ -1,8 +1,12 @@
 {
+  "jest": {
+  "testMatch": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"]
+},
   "name": "client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "test": "react-scripts test",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -28,11 +32,17 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.51.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "22.13.2",
     "@types/react": "19.0.8",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "jest-mock-fetch": "^2.0.5",
     "postcss": "^8",
+    "react-scripts": "^5.0.1",
     "tailwindcss": "^3.4.1"
   }
+  
 }
