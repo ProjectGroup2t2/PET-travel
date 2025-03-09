@@ -16,13 +16,10 @@ export default function ToursPage() {
     <div className="flex-1">
       <AdminHeader title="Tours Management" />
 
-      {/* Main Content */}
       <div className="p-8">
         <h2 className="text-2xl font-semibold text-[#2A8470] mb-6">Add Tour</h2>
 
-        {/* Grid of Tours */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Tour Cards */}
           {tours.map((tour) => (
             <div
               key={tour.id}
@@ -42,7 +39,6 @@ export default function ToursPage() {
             </div>
           ))}
 
-          {/* Add Tour Card */}
           <Link href="/admin/tours/add">
             <div className="bg-white rounded-2xl shadow-sm border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-8 hover:border-[#2A8470] transition-colors cursor-pointer min-h-[280px]">
               <Plus className="h-8 w-8 text-gray-400 mb-2" />

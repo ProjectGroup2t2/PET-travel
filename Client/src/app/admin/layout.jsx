@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 export default function AdminLayout({ children }) {
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
+
       <div className="w-60 min-h-screen bg-white border-r">
         <div className="p-6 border-b">
           <Link href="/admin" className="flex items-center">
@@ -49,7 +49,6 @@ export default function AdminLayout({ children }) {
         </nav>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1">{children}</div>
     </div>
   )

@@ -6,7 +6,6 @@ import { Calendar, Star } from "lucide-react"
 import { Facebook, Instagram, MessageCircle, Twitter } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
-// Mock data for tours
 const mockTours = [
   {
     id: 1,
