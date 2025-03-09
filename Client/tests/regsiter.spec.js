@@ -10,6 +10,5 @@ test('test', async ({ page }) => {
   await page.getByRole('textbox', { name: 'PASSWORD', exact: true }).fill('123456');
   await page.getByRole('textbox', { name: 'CONFIRM PASSWORD' }).click();
   await page.getByRole('textbox', { name: 'CONFIRM PASSWORD' }).fill('123456');
-  await page.getByRole('textbox', { name: 'CONFIRM PASSWORD' }).press('Enter');
   await page.getByRole('button', { name: 'REGISTER' }).click();
 });
