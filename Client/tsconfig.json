@@ -28,6 +28,6 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "tests/register.spec.js", "tests/regsiter.spec.js"  ],
   "exclude": ["node_modules"]
 }
