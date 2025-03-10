@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -16,29 +16,70 @@
       "type": "string"
     },
     "price": {
-      "type": "integer"
+      "type": "decimal"
     },
     "duration": {
       "type": "string"
     },
-    "capacity_max": {
+    "capacity": {
       "type": "integer"
     },
-    "capacity": {
+    "capacity_max": {
       "type": "integer"
     },
     "description": {
       "type": "blocks"
     },
-    "image": {
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
+    },
+    "users_permissions_users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "packages"
+    },
+    "payments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment.payment",
+      "mappedBy": "package"
+    },
+    "reviews": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::review.review",
+      "mappedBy": "package"
+    },
+    "isAvailable": {
+      "type": "enumeration",
+      "enum": [
+        "Available",
+        "Not Available"
+      ]
+    },
+    "specials": {
+      "type": "json"
+    },
+    "timeOfTour": {
+      "type": "json"
+    },
+    "startDate": {
+      "type": "date"
+    },
+    "history_packages": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::history-package.history-package",
+      "mappedBy": "packages"
     }
   }
 }

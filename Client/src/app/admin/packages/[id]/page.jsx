@@ -1,243 +1,367 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Image from "next/image"
 import { AdminHeader } from "@/components/ui/admin/header"
 
 export default function PackageDetail() {
-  const { id } = useParams() // ดึง id จาก URL
-  const [tour, setTour] = useState(null)
-  const [isConfirmed, setIsConfirmed] = useState(false) // สถานะคอนเฟิร์ม
-  const [customers, setCustomers] = useState([
-    { id: 1, name: "Yim Yim", email: "example@gmail.com", booking: "Paid", unit: "", status: "" },
-    { id: 2, name: "Imy Imy", email: "example@gmail.com", booking: "Unpaid", unit: "", status: "" },
-    { id: 3, name: "Myi Myi", email: "example@gmail.com", booking: "Unpaid", unit: "", status: "" },
-    { id: 4, name: "Yim Yim", email: "example@gmail.com", booking: "Unpaid", unit: "", status: "" },
-  ])
+  const { id } = useParams()
+  const router = useRouter()
+  const [packageData, setPackageData] = useState(null)
+  const [customers, setCustomers] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [selectedCustomer, setSelectedCustomer] = useState(null)
+  const [error, setError] = useState(null)
+  const [notification, setNotification] = useState(null) // สำหรับแจ้งเตือน
 
   useEffect(() => {
-    const tourData = {
-      1: {
-        image: "/1.jpg",
-        title: "เมืองเก่าภูเก็ต",
-        customerName: "สมชาย ใจดี",
-        email: "somchai@example.com",
-        phone: "081-234-5678",
-        paymentStatus: "Paid", // Paid หรือ Unpaid
-        price: "THB X,XXX",
-      },
-      2: {
-        image: "/login-pic.png",
-        title: "เชียงใหม่",
-        customerName: "นางสาวพิมพ์ใจ สายลม",
-        email: "pimjai@example.com",
-        phone: "090-123-4567",
-        paymentStatus: "Unpaid",
-        price: "THB Y,YYY",
-      },
+    const fetchPackageDetails = async () => {
+      try {
+        const token = sessionStorage.getItem('auth.jwt')
+        if (!token) throw new Error('No authentication token found')
+
+        // Fetch Package Details
+        const packageResponse = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/packages/${id}?populate=*`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        })
+        if (!packageResponse.ok) throw new Error('Failed to fetch package details')
+        const packageResult = await packageResponse.json()
+
+        // Fetch Related Payments with explicit populate for payment_slip
+        const paymentsResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/payments?filters[package][id]=${id}&populate[users_permissions_user][populate]=*&populate[payment_slip][populate]=*`,
+          {
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+          }
+        )
+        if (!paymentsResponse.ok) throw new Error('Failed to fetch payments')
+        const paymentsResult = await paymentsResponse.json()
+
+        console.log("Payments data:", paymentsResult.data)
+
+        setPackageData(packageResult.data)
+        const transformedCustomers = paymentsResult.data ? paymentsResult.data.map(payment => {
+          console.log("Payment slip for payment", payment.id, ":", payment.attributes.payment_slip)
+          return {
+            id: payment.id,
+            name: payment.attributes.users_permissions_user?.data?.attributes?.name || 'N/A',
+            email: payment.attributes.users_permissions_user?.data?.attributes?.email || 'N/A',
+            phone: payment.attributes.users_permissions_user?.data?.attributes?.phone || 'N/A',
+            booking: payment.attributes.payment_status || 'Pending',
+            paymentAmount: payment.attributes.amount || 0,
+            paymentDate: payment.attributes.payment_date || null,
+            slip: payment.attributes.payment_slip?.data?.attributes?.url || null
+          }
+        }) : []
+        setCustomers(transformedCustomers)
+        setIsLoading(false)
+      } catch (error) {
+        console.error("Error fetching package details:", error)
+        setError(error)
+        setIsLoading(false)
+      }
     }
 
-    setTour(tourData[id])
+    if (id) fetchPackageDetails()
   }, [id])
 
-  if (!tour) return <p>Loading...</p>
+  const updatePaymentStatus = async (paymentId, newStatus) => {
+    try {
+      const token = sessionStorage.getItem('auth.jwt')
+      if (!token) throw new Error('No authentication token found')
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/payments/${paymentId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          data: {
+            payment_status: newStatus
+          }
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error?.message || 'Failed to update payment status')
+      }
+
+      // อัปเดต state ในตาราง
+      setCustomers(prevCustomers =>
+        prevCustomers.map(customer =>
+          customer.id === paymentId ? { ...customer, booking: newStatus } : customer
+        )
+      )
+
+      // อัปเดต selectedCustomer ใน Modal ถ้ามีการเปลี่ยนแปลง
+      if (selectedCustomer && selectedCustomer.id === paymentId) {
+        setSelectedCustomer(prev => ({ ...prev, booking: newStatus }))
+      }
+
+      // แจ้งเตือนลูกค้า
+      setNotification(`Payment status updated to ${newStatus} for payment ID ${paymentId}`)
+      setTimeout(() => setNotification(null), 3000) // ลบการแจ้งเตือนหลัง 3 วินาที
+
+      // ดึงข้อมูลใหม่เพื่อรีเฟรชสลิป (ถ้ามีการเปลี่ยนแปลงที่อาจกระทบสลิป)
+      const paymentResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/payments/${paymentId}?populate[payment_slip][populate]=*`,
+        {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        }
+      )
+      if (paymentResponse.ok) {
+        const paymentResult = await paymentResponse.json()
+        const updatedPayment = paymentResult.data
+        const updatedSlip = updatedPayment.attributes.payment_slip?.data?.attributes?.url || null
+        setCustomers(prevCustomers =>
+          prevCustomers.map(customer =>
+            customer.id === paymentId ? { ...customer, slip: updatedSlip } : customer
+          )
+        )
+        if (selectedCustomer && selectedCustomer.id === paymentId) {
+          setSelectedCustomer(prev => ({ ...prev, slip: updatedSlip }))
+        }
+      }
+    } catch (error) {
+      console.error("Error updating payment status:", error.message)
+      alert(`Failed to update payment status: ${error.message}`)
+    }
+  }
+
+  if (isLoading) return <p>Loading...</p>
+  if (error) return <p>Error loading package details: {error.message}</p>
+  if (!packageData) return <p>Package not found</p>
+
+  const { title, price, duration, description, images, capacity, capacity_max } = packageData.attributes
 
   return (
     <div className="flex-1">
-      {/* Main Content */}
+      {/* Notification Toast */}
+      {notification && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          {notification}
+        </div>
+      )}
+
       <div className="flex-1 flex flex-col">
         <AdminHeader title="Packages Management" />
-        {/* Content */}
+        
         <div className="flex-1 p-6 overflow-auto">
-          <h1 className="text-3xl font-bold text-[#2A8470] mb-4">{tour.title}</h1>
+          <h1 className="text-3xl font-bold text-[#2A8470] mb-4">{title}</h1>
 
-          {/* Tour Image */}
+          {/* Package Image */}
           <div className="w-full h-[250px] overflow-hidden rounded-lg mb-8">
             <Image
-              src={tour.image || "/placeholder.svg"}
-              alt={tour.title}
+              src={images.data ? `${process.env.NEXT_PUBLIC_STRAPI_URL}${images.data[0].attributes.url}` : "/placeholder.svg"}
+              alt={title}
               width={1000}
               height={250}
               className="object-cover w-full h-full"
             />
           </div>
 
-          {/* Tour Details */}
+          {/* Package Details */}
           <div className="grid grid-cols-2 gap-8 mb-8">
             <div>
-              <h2 className="text-xl font-semibold mb-4 text-[#2A8470]">กำหนดการเดินทาง</h2>
-              <div className="bg-white rounded-lg p-4 shadow-sm min-h-[100px]">
-                <div className="flex items-center gap-2">
-                  <div>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>วันที่ 1	12.00-14.00	รับที่สนามบิน, ไปที่พัก (โรงแรมฮอลิเดย์ อินน์)</li>
-                      <li>วันที่ 1	15.00-18.00	เที่ยวหาดป่าตอง</li>
-                      <li>วันที่ 2	08.00-17.00	ทริปเกาะพีพี</li>
-                      <li>วันที่ 3	09.00-12.00	พิพิธภัณฑ์เหมืองแร่</li>
-                      <li>วันที่ 3	13.00-16.00	วัดฉลอง</li>
-                      <li>วันที่ 4	09.00-11.00	ช้อปปิ้ง, ส่งสนามบิน</li>
-                    </ul>
-                  </div>
-                </div>
-                {/* Travel schedule content would go here */}
+              <h2 className="text-xl font-semibold mb-4 text-[#2A8470]">Package Description</h2>
+              <div className="bg-white rounded-lg p-4 shadow-sm max-h-[200px] overflow-y-auto border border-gray-200">
+                {description?.[0]?.children?.[0]?.text || "No description available"}
               </div>
             </div>
             <div>
-              <h2 className="text-xl font-semibold mb-4 text-[#2A8470]">สถานที่ท่องเที่ยว</h2>
+              <h2 className="text-xl font-semibold mb-4 text-[#2A8470]">Package Information</h2>
               <div className="bg-white rounded-lg p-4 shadow-sm min-h-[100px]">
-                <div className="flex items-center gap-2">
-                  <div>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>หาดป่าตอง</li>
-                      <li>เกาะพีพี</li>
-                      <li>พิพิธภัณฑ์เหมืองแร่</li>
-                      <li>วัดฉลอง</li>
-                    </ul>
-                  </div>
-                </div>
-                {/* Tourist attractions content would go here */}
+                <ul className="space-y-2">
+                  <li><strong>Duration:</strong> {duration}</li>
+                  <li><strong>Price:</strong> THB {price}</li>
+                  <li><strong>Capacity:</strong> {capacity} - {capacity_max} persons</li>
+                </ul>
               </div>
             </div>
           </div>
 
           {/* Customer Booking Information */}
           <div className="border rounded-lg p-6 mb-6">
-            <h2 className="text-xl font-semibold text-[#2A8470] mb-4">ข้อมูลการจองของลูกค้า</h2>
+            <h2 className="text-xl font-semibold text-[#2A8470] mb-4">Customer Information</h2>
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border p-2 text-left">Full name</th>
-                    <th className="border p-2 text-left">Email</th>
-                    <th className="border p-2 text-left">Booking</th>
-                    <th className="border p-2 text-left">Unit</th>
-                    <th className="border p-2 text-left">Status</th>
-                    <th className="border p-2 text-left">Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {customers.map((customer) => (
-                    <tr
-                      key={customer.id}
-                      className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() => {
-                        setSelectedCustomer(customer)
-                        setShowModal(true)
-                      }}
-                    >
-                      <td className="border p-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs">
-                            👤
-                          </div>
-                          {customer.name}
-                        </div>
-                      </td>
-                      <td className="border p-2">{customer.email}</td>
-                      <td className="border p-2">
-                        <span className={customer.booking === "Paid" ? "text-green-500" : "text-red-500"}>
-                          {customer.booking}
-                        </span>
-                      </td>
-                      <td className="border p-2">{customer.unit || "All day"}</td>
-                      <td className="border p-2">{customer.unit || "Successful"}</td>
-                      <td className="border p-2">
-                        <button
-                          className="bg-[#2A8470] text-white px-2 py-2 rounded-lg hover:bg-[#1f6354] transition"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedCustomer(customer)
-                            setShowModal(true)
-                          }}
-                        >
-                          View Details
-                        </button>
-                      </td>
+              {customers.length > 0 ? (
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="border p-2 text-left">Name</th>
+                      <th className="border p-2 text-left">Email</th>
+                      <th className="border p-2 text-left">Payment Status</th>
+                      <th className="border p-2 text-left">Amount</th>
+                      <th className="border p-2 text-left">Payment Date</th>
+                      <th className="border p-2 text-left">Details</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {customers.map((customer) => (
+                      <tr
+                        key={customer.id}
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => {
+                          setSelectedCustomer(customer)
+                          setShowModal(true)
+                        }}
+                      >
+                        <td className="border p-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs">
+                              👤
+                            </div>
+                            {customer.name}
+                          </div>
+                        </td>
+                        <td className="border p-2">{customer.email}</td>
+                        <td className="border p-2">
+                          <select
+                            value={customer.booking}
+                            onChange={(e) => updatePaymentStatus(customer.id, e.target.value)}
+                            className={`border rounded p-1 font-medium ${
+                              customer.booking === "Approved"
+                                ? "text-green-500 border-green-500"
+                                : customer.booking === "Pending"
+                                ? "text-yellow-500 border-yellow-500"
+                                : "text-red-500 border-red-500"
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <option value="Pending" className="text-yellow-500">Pending</option>
+                            <option value="Approved" className="text-green-500">Approved</option>
+                            <option value="Rejected" className="text-red-500">Rejected</option>
+                          </select>
+                        </td>
+                        <td className="border p-2">THB {customer.paymentAmount}</td>
+                        <td className="border p-2">
+                          {customer.paymentDate 
+                            ? new Date(customer.paymentDate).toLocaleDateString() 
+                            : 'N/A'}
+                        </td>
+                        <td className="border p-2">
+                          <button
+                            className="bg-[#2A8470] text-white px-2 py-2 rounded-lg hover:bg-[#1f6354] transition"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedCustomer(customer)
+                              setShowModal(true)
+                            }}
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-gray-500 text-center">No bookings found for this package</p>
+              )}
             </div>
           </div>
 
-          {/* Save Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={() => setIsConfirmed(true)}
-              className="bg-[#2A8470] text-white px-8 py-2 rounded-lg hover:bg-[#1f6354] transition"
-            >
-              SAVE
-            </button>
-          </div>
-        </div>
-        {showModal && selectedCustomer && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full">
-              <h2 className="text-4xl font-bold mb-8">Information</h2>
+          {/* Customer Details Modal */}
+          {showModal && selectedCustomer && (
+            <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative transform transition-all duration-300 scale-100">
+                {/* Header */}
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-3xl font-bold text-gray-800">Customer Details</h2>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
 
-              <div className="space-y-6">
-                <div className="flex items-start">
-                  <div className="w-1/2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-3xl">👤</span>
-                      <span className="text-xl text-gray-500">Travelers</span>
+                {/* Content */}
+                <div className="space-y-5">
+                  {/* Customer Info */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">👤</span>
+                      <span className="text-lg font-semibold text-gray-700">Name</span>
+                    </div>
+                    <div>
+                      <span className="text-lg text-gray-600">{selectedCustomer.name}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-lg font-semibold text-gray-700">Email</span>
+                    </div>
+                    <div>
+                      <span className="text-lg text-gray-600">{selectedCustomer.email}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-lg font-semibold text-gray-700">Phone</span>
+                    </div>
+                    <div>
+                      <span className="text-lg text-gray-600">{selectedCustomer.phone}</span>
+                    </div>
+
+                    <div>
+                      <span className="text-lg font-semibold text-gray-700">Payment Status</span>
+                    </div>
+                    <div>
+                      <span
+                        className={`text-lg font-medium ${
+                          selectedCustomer.booking === "Approved"
+                            ? "text-green-500"
+                            : selectedCustomer.booking === "Pending"
+                            ? "text-yellow-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {selectedCustomer.booking}
+                      </span>
                     </div>
                   </div>
-                  <div className="w-1/2">
-                    <span className="text-xl">2 คน</span>
+
+                  {/* Payment Slip */}
+                  <div className="border-t pt-4">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-3">Payment Slip</h3>
+                    {selectedCustomer.slip ? (
+                      <div className="flex justify-center">
+                        {console.log("Slip URL:", `${process.env.NEXT_PUBLIC_STRAPI_URL}${selectedCustomer.slip}`)}
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${selectedCustomer.slip}`}
+                          alt="Payment Slip"
+                          width={300}
+                          height={400}
+                          className="object-contain rounded-lg shadow-md max-h-[400px] w-auto"
+                          onError={(e) => console.error("Error loading slip image:", e)}
+                        />
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-center">No slip available</p>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-start">
-                  <div className="w-1/2">
-                    <span className="text-xl font-bold">Time of Tour</span>
-                  </div>
-                  <div className="w-1/2">
-                    <span className="text-xl text-gray-500">All day</span>
-                  </div>
+                {/* Footer */}
+                <div className="mt-8 flex justify-end">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="bg-[#2A8470] text-white px-5 py-2 rounded-lg hover:bg-[#1f6354] transition-colors font-medium"
+                  >
+                    Close
+                  </button>
                 </div>
-
-                <div className="flex items-start">
-                  <div className="w-1/2">
-                    <span className="text-xl font-bold">Pickup points</span>
-                  </div>
-                  <div className="w-1/2">
-                    <span className="text-xl">Pick and drop off</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-1/2">
-                    <span className="text-xl text-gray-500">ระบุสถานที่ :</span>
-                  </div>
-                  <div className="w-1/2">
-                    <span className="text-xl text-gray-500">โรงแรมยิม</span>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="w-1/2">
-                    <span className="text-xl font-bold">Specials :</span>
-                  </div>
-                  <div className="w-1/2">
-                    <span className="text-xl text-gray-500">อาหารฮาลาล</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 flex justify-end">
-                <button className="bg-gray-200 px-4 py-2 rounded-lg" onClick={() => setShowModal(false)}>
-                  Close
-                </button>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
 }
-

@@ -20,7 +20,7 @@ const Register = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:1337/api/auth/local/register",
+        `${process.env.NEXT_PUBLIC_STRAPI_URL}/api/auth/local/register`,
         {
           username: data.username,
           email: data.email,
@@ -29,7 +29,7 @@ const Register = () => {
       );
 
       console.log("Register Success:", response.data);
-      router.push("/"); // สมัครเสร็จให้ไปหน้า Login
+      router.push("/"); 
     } catch (error) {
       setErrorMessage(error.response?.data?.message || "Registration failed.");
     }
@@ -37,7 +37,7 @@ const Register = () => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left Side - Image */}
+
       <div className="hidden lg:flex w-1/2 relative">
         <Image
           src="/login-pic.png"
@@ -47,7 +47,6 @@ const Register = () => {
         />
       </div>
 
-      {/* Right Side - Register Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="max-w-md w-full text-center flex flex-col items-center">
           <Image
@@ -57,7 +56,6 @@ const Register = () => {
             alt="PET SEA TRAVEL"
           />
 
-          {/* Form */}
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="w-full mt-[0px] space-y-4"
@@ -101,7 +99,6 @@ const Register = () => {
             </button>
           </form>
 
-          {/* Social Login */}
           <div className="mt-6">
             <div className="w-full flex items-center justify-center">
               <div className="flex-1 border-t-2 border-gray-300"></div>
@@ -117,7 +114,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Login Link */}
           <p className="mt-4 text-base">
             LET'S GO!{" "}
             <a href="/login" className="text-[#2D776E] font-semibold">

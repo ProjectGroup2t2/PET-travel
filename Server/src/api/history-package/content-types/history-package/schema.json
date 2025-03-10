@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "history_packages",
+  "info": {
+    "singularName": "history-package",
+    "pluralName": "history-packages",
+    "displayName": "history-package"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "history_packages"
+    },
+    "packages": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::package.package",
+      "inversedBy": "history_packages"
+    }
+  }
+}

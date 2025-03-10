@@ -71,6 +71,36 @@
         "admin",
         "user"
       ]
+    },
+    "packages": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::package.package",
+      "mappedBy": "users_permissions_users"
+    },
+    "payments": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::payment.payment",
+      "mappedBy": "users_permissions_user"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "reviews": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::review.review",
+      "mappedBy": "users_permissions_user"
+    },
+    "history_packages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::history-package.history-package",
+      "mappedBy": "users_permissions_user"
     }
   }
 }
